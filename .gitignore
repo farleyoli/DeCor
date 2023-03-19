@@ -6,6 +6,5 @@ gradle/
 .gradle
 build
 gradle
-build.gradle
 gradlew
 gradlew.bat
