@@ -7,9 +7,6 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MainContainer extends JFrame {
     final private Book book;
@@ -22,7 +19,6 @@ public class MainContainer extends JFrame {
     private final String pdfName;
 
     private void createDirectories() {
-//        File linuxDirectory = new File(LINUX_BASE_DIRECTORY);
         File linuxDirectory = new File(GlobalConfig.getBaseFolder());
         if (!linuxDirectory.exists())
             linuxDirectory.mkdirs();
