@@ -1,0 +1,154 @@
+<script>
+if (typeof ranAlready === 'undefined' ){
+let ranAlready = true;
+let firstChild = null;
+
+function showAnswer() {
+    document.getElementById("global").hidden = false;
+}
+
+function createElementFromHTML(htmlString) {
+  var div = document.createElement('div');
+  div.innerHTML = htmlString.trim();
+
+  // Change this to div.childNodes to support multiple top-level nodes.
+  return div.firstChild;
+}
+
+
+// front, back, beginningPage, beginningPercentage, endPage, endPercentage, id
+// Maybe eventually think of some resize event.
+const frontDiv                  = document.getElementById('front');
+const backDiv 			        = document.getElementById('back');
+const beginningPageDiv 		    = document.getElementById('beginningPage');
+const beginningPercentageDiv 	= document.getElementById('beginningPercentage');
+const endPageDiv 				= document.getElementById('endPage');
+const endPercentageDiv 			= document.getElementById('endPercentage');
+const idDiv 					= document.getElementById('id');
+const cardKeyDiv				= document.getElementById('cardKey');
+
+const front 				= frontDiv.innerHTML;
+const back					= backDiv.innerHTML
+const beginningPage 		= parseInt(beginningPageDiv.innerHTML)-1;
+const beginningPercentage	= parseFloat(beginningPercentageDiv.innerHTML);
+const endPage 				= parseInt(endPageDiv.innerHTML)-1;
+const endPercentage			= parseFloat(endPercentageDiv.innerHTML);
+const id 					= idDiv.innerHTML;
+const cardKey 				= cardKeyDiv.innerHTML;
+const hash 					= cardKey.substring(0, cardKey.indexOf("_"));
+
+let first = beginningPage;
+let last = endPage;
+
+frontDiv.innerHTML 					= "";
+backDiv.innerHTML 					= "";
+beginningPageDiv.innerHTML 			= "";
+beginningPercentageDiv.innerHTML	= "";
+endPageDiv.innerHTML 				= "";
+endPercentageDiv.innerHTML 			= "";
+idDiv.innerHTML 					= "";
+cardKeyDiv.innerHTML 				= "";
+//cardKeyDiv.innerHTML 				= hash;
+
+const getImage = n => {
+	const subhash = hash.substring(hash.length - 38, hash.length);
+	const imgName = subhash + "_" + n.toString().padStart(7, "0") + ".jpg";
+
+	const container     = document.createElement("div");
+	container.className = "container";
+
+	let svgHtml = '';
+
+	svgHtml += "<div class=\"container\"><img src =\"";
+	svgHtml += imgName;
+	if (n == beginningPage)
+		svgHtml += "\" id=\"firstP\"><svg id=answer width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
+	else
+		svgHtml += "\" id=\"page" + n.toString() +"\"><svg width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
+
+	const svg = createElementFromHTML(svgHtml);
+
+	container.appendChild(svg);
+
+	return container;
+};
+
+const placeCard = (container, beg, end) => {
+// image:	document.getElementById('hue').innerText = container.childNodes[0].childNodes[0];
+// svg: document.getElementById('hue').innerText = container.childNodes[0].childNodes[1];
+// rect: document.getElementById('hue').innerText = container.childNodes[0].childNodes[1].childNodes[0];
+// document.getElementById('hue').innerText = container.childNodes[0].childNodes[1].outerHTML;
+
+	const img = container.childNodes[0].childNodes[0];
+	let height = img.getBoundingClientRect().height;
+
+ 	const y0 = Math.floor(beg * height).toString() + "px";
+	const dy = Math.floor((end - beg) * height).toString() + "px";
+	const svgE = container.childNodes[0].childNodes[1];
+	svgE.style.top = y0;
+	svgE.setAttribute("height", dy);
+}
+
+const getBounds = (page) => {
+
+	let beg = page == beginningPage ? beginningPercentage : 0;
+	let end = page == endPage ? endPercentage : 1;
+
+	return [beg, end];
+}
+
+for (i = beginningPage; i <= endPage; i++) {
+	const container = getImage(i, hash);
+	if (i == beginningPage)
+		firstChild = container.childNodes[0].childNodes[1];
+
+	[beg, end] = getBounds(i);
+
+	container.childNodes[0].childNodes[0].onload = placeCard.bind(null, container, beg, end);
+	window.addEventListener("resize", placeCard.bind(null, container, beg, end));
+	document.getElementById("content").appendChild(container);
+}
+
+document.getElementById("addDown").onclick = function() {
+	document.getElementById("content").appendChild(getImage(++last));
+}
+
+document.getElementById("addUp").onclick = function() {
+	cont = document.getElementById("content");
+	cont.insertBefore(getImage(--first), cont.firstChild);
+}
+
+document.addEventListener('keypress', function(event) {
+    var key = event.key || event .keyCode;
+
+    if (key == 'g'){
+		firstChild.scrollIntoView({
+            behavior: 'auto',
+            block: 'center',
+            inline: 'center'
+        });
+    }
+});
+}
+</script>
+
+{{front}}
+
+<div id="front">{{front}}</div>
+<div id="back">{{back}}</div>
+<div id="beginningPage">{{beginningPage}}</div>
+<div id="beginningPercentage">{{beginningPercentage}}</div>
+<div id="endPage">{{endPage}}</div>
+<div id="endPercentage">{{endPercentage}}</div>
+<div id="id">{{id}}</div>
+<div id="cardKey">{{cardKey}}</div>
+
+<div id="hue"></div>
+
+<div id="global">
+    <input id="addUp" type="button" value="Add Page" />
+    <div id="content"></div>
+    <input id="addDown" type="button" value="Add Page" />
+</div>
+
+
