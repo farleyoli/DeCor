@@ -77,7 +77,6 @@ public class MainContainer extends JFrame {
         }
         String[] choices = new String[choicesList.size()];
         choicesList.toArray(choices);
-//        String[] choices = {"hull1", "numbers_and_sets", "csapp3-representing-and-manipulating-information"};
         return (String) JOptionPane.showInputDialog(null, "Choose pdf to open",
                 "Choose pdf to open", JOptionPane.QUESTION_MESSAGE, null, // Use
                 // default

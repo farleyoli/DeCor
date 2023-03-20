@@ -131,7 +131,6 @@ public class AnkiConnectHandler {
             if (jo.get("error").toString().equals("null")) {
                 System.out.println("Deck already existed or was successfully newly created.");
             }
-//            ArrayList<String> decks = (ArrayList<String>) jo.toMap().get("result");
         } catch (URISyntaxException | IOException | InterruptedException e) {
             System.out.printf("There was a problem creating the deck %s if it was absent.\n", deckName);
             throw new RuntimeException(e);

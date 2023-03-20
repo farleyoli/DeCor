@@ -51,7 +51,7 @@ task customFatJar(type: Jar) {
     manifest {
         attributes 'Main-Class': 'fso.decor.Main'
     }
-    baseName = 'all-in-one-jar'
+    baseName = 'DeCor'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
