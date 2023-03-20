@@ -26,6 +26,13 @@ public class Book extends JPanel {
         add(page);
     }
 
+    public void addBlankPage(File pathToImage) {
+        Page page = new Page(pathToImage, lastPage, this, true);
+        idToPage.put(lastPage, page);
+        lastPage++;
+        add(page);
+    }
+
     public Deck getDeck() {
         return deck;
     }

@@ -13,6 +13,7 @@ public class Page extends JPanel {
     private int pageHeight;
     private int pageNumber;
     private final Book book;
+    private boolean isBlank = false;
 
     public Page(File pathToImage, Book book) {
         this.book = book;
@@ -20,14 +21,6 @@ public class Page extends JPanel {
         try {
             BufferedImage img = ImageIO.read(pathToImage);
             ImageIcon icon = new ImageIcon(img);
-
-//            int oW = icon.getIconWidth();
-//            int oH = icon.getIconHeight();
-//            // resizing
-//            Image image = icon.getImage(); // transform it
-//            Image newimg = image.getScaledInstance((int) (1.5 * oW), (int) (1.5 * oH),  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
-//            icon = new ImageIcon(newimg);  // transform it back
-
             pageHeight = icon.getIconHeight();
             label = new JLabel(icon);
             label.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -36,7 +29,6 @@ public class Page extends JPanel {
             e.printStackTrace();
             return;
         }
-//        setBackground(Color.RED);
         bar = new ScrollBar(pageHeight, this);
         add(bar);
         add(label);
@@ -47,6 +39,37 @@ public class Page extends JPanel {
     public Page(File pathToImage, int pageNumber, Book book) {
         this(pathToImage, book);
         this.pageNumber = pageNumber;
+    }
+
+    public Page(File pathToImage, int pageNumber, Book book, boolean isBlank) {
+        this.isBlank = true;
+        this.book = book;
+        setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        this.pageNumber = pageNumber;
+        try {
+            BufferedImage img = ImageIO.read(pathToImage);
+            int width = img.getWidth();
+            int height = pageHeight = img.getHeight();
+            label = new JLabel(){
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.setColor(Color.LIGHT_GRAY);
+                    g.fillRect(0, 0, width, height);
+                }
+            };
+            label.setPreferredSize(new Dimension(width, height));
+            label.setAlignmentX(Component.CENTER_ALIGNMENT);
+            label.setBackground(Color.GREEN);
+        } catch (IOException e) {
+            System.out.println(pathToImage.getAbsolutePath());
+            e.printStackTrace();
+            return;
+        }
+        bar = new ScrollBar(pageHeight, this);
+        add(bar);
+        add(label);
+        label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
     }
 
     public int getPageNumber() {

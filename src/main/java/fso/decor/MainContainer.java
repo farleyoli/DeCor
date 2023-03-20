@@ -52,7 +52,7 @@ public class MainContainer extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(scrollPaneMouseIncrement);
         getContentPane().add(scrollPane);
 
-        addImagesToPanel();
+        setupPanel();
 
         setKeybindings();
 
@@ -85,7 +85,7 @@ public class MainContainer extends JFrame {
                 choices[0]); // Initial choice
     }
 
-    private void addImagesToPanel() {
+    private void setupPanel() {
         String pdfHash = pdfManager.getPdfHash();
         File[] resources = destFolder.listFiles();
         if (resources == null)
@@ -93,7 +93,7 @@ public class MainContainer extends JFrame {
         Arrays.sort(resources);
         for (File file : resources) {
             if (file.getName().contains(pdfHash) && file.getName().endsWith(".jpg")) {
-                book.addPage(file);
+                book.addBlankPage(file);
             }
         }
 

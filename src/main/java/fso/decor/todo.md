@@ -9,3 +9,4 @@
 * Add support to Windows
 * Deal with LaTeX bug in input
 * Add support for same card in two different locations
+* Add message for when DeCor is loading images of pdf
