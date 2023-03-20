@@ -27,10 +27,12 @@ public class Book extends JPanel {
     }
 
     public void addBlankPage(File pathToImage) {
-        Page page = new Page(pathToImage, lastPage, this, true);
+        Page page = new Page(pathToImage, lastPage, this);
         idToPage.put(lastPage, page);
         lastPage++;
         add(page);
+        if (lastPage < 10)
+            page.showImage();
     }
 
     public Deck getDeck() {

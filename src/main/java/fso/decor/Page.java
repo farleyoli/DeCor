@@ -13,37 +13,13 @@ public class Page extends JPanel {
     private int pageHeight;
     private int pageNumber;
     private final Book book;
-    private boolean isBlank = false;
-
-    public Page(File pathToImage, Book book) {
-        this.book = book;
-        setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        try {
-            BufferedImage img = ImageIO.read(pathToImage);
-            ImageIcon icon = new ImageIcon(img);
-            pageHeight = icon.getIconHeight();
-            label = new JLabel(icon);
-            label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        } catch (IOException e) {
-            System.out.println(pathToImage.getAbsolutePath());
-            e.printStackTrace();
-            return;
-        }
-        bar = new ScrollBar(pageHeight, this);
-        add(bar);
-        add(label);
-
-        label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
-    }
+    private boolean isBlank;
+    private File pathToImage;
 
     public Page(File pathToImage, int pageNumber, Book book) {
-        this(pathToImage, book);
-        this.pageNumber = pageNumber;
-    }
-
-    public Page(File pathToImage, int pageNumber, Book book, boolean isBlank) {
         this.isBlank = true;
         this.book = book;
+        this.pathToImage = pathToImage;
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         this.pageNumber = pageNumber;
         try {
@@ -68,6 +44,24 @@ public class Page extends JPanel {
         }
         bar = new ScrollBar(pageHeight, this);
         add(bar);
+        add(label);
+        label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
+        this.pageNumber = pageNumber;
+    }
+
+    public void showImage() {
+        this.isBlank = false;
+        try {
+            BufferedImage img = ImageIO.read(pathToImage);
+            ImageIcon icon = new ImageIcon(img);
+            remove(label);
+            label = new JLabel(icon);
+            label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        } catch (IOException e) {
+            System.out.println(pathToImage.getAbsolutePath());
+            e.printStackTrace();
+            return;
+        }
         add(label);
         label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
     }
