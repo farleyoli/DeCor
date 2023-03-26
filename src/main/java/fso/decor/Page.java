@@ -50,7 +50,6 @@ public class Page extends JPanel {
     }
 
     public void showImage() {
-        this.isBlank = false;
         try {
             BufferedImage img = ImageIO.read(pathToImage);
             ImageIcon icon = new ImageIcon(img);
@@ -64,7 +63,12 @@ public class Page extends JPanel {
         }
         add(label);
         label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
+        this.isBlank = false;
     }
+
+    public boolean isBlank() {
+        return isBlank;
+    } 
 
     public int getPageNumber() {
         return pageNumber;

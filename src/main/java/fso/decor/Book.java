@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Book extends JPanel {
     private int lastPage;
@@ -19,6 +20,11 @@ public class Book extends JPanel {
         state = new BookState();
         idToPage = new HashMap<>();
     }
+
+    public int getLastPage() {
+        return lastPage;
+    }
+
     public void addPage(File pathToImage) {
         Page page = new Page(pathToImage, lastPage, this);
         idToPage.put(lastPage, page);
@@ -26,13 +32,17 @@ public class Book extends JPanel {
         add(page);
     }
 
-    public void addBlankPage(File pathToImage) {
+    public void addBlankPage(File pathToImage, int startPage) {
         Page page = new Page(pathToImage, lastPage, this);
         idToPage.put(lastPage, page);
         lastPage++;
         add(page);
-        if (lastPage < 10)
+        if (startPage - 6 < lastPage && lastPage < startPage + 6)
             page.showImage();
+    }
+
+    public void addBlankPage(File pathToImage) {
+        addBlankPage(pathToImage, 1);
     }
 
     public Deck getDeck() {
@@ -48,7 +58,14 @@ public class Book extends JPanel {
     }
 
     public Page getLastMarkedPage() {
-        int lastMarkedPage = Collections.max(deck.getPageToCards().keySet());
-        return idToPage.get(lastMarkedPage);
+        if (deck.getPageToCards().size() > 0) {
+            int lastMarkedPage = Collections.max(deck.getPageToCards().keySet());
+            return idToPage.get(lastMarkedPage);
+        }
+        return null;
+    }
+
+    public Set<Integer> getIdsSet() {
+        return idToPage.keySet();
     }
 }

@@ -1,12 +1,17 @@
 package fso.decor;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainContainer extends JFrame {
     final private Book book;
@@ -17,6 +22,7 @@ public class MainContainer extends JFrame {
 
     final private int scrollPaneMouseIncrement = 18;
     private final String pdfName;
+    private int maxPositionOfPage;
 
     private void createDirectories() {
         File linuxDirectory = new File(GlobalConfig.getBaseFolder());
@@ -58,15 +64,56 @@ public class MainContainer extends JFrame {
 
         setSize(800, 600);
         setVisible(true);
+        addListenersForRendering();
         scrollToLastMarkedPage();
+        getPageToPosition();
     }
 
-    public void scrollToLastMarkedPage() {
+    private void scrollToLastMarkedPage() {
         Page lastMarkedPage = book.getLastMarkedPage();
+        if (lastMarkedPage == null) // We need this for when no page is marked
+            return;
         JViewport view = scrollPane.getViewport();
         Point p = lastMarkedPage.getLocation();
         view.setViewPosition(p);
     }
+
+    // TODO: Make sure we do not accept image heights smaller than 100
+    // TODO: Get rid of magic number
+    private Map<Integer, Integer> getPageToPosition() {
+        Map<Integer, Integer> ret = new HashMap<>(); // pages will be at least 10 separated
+        int maxPositionOfPage = -1;
+        for (int id : book.getIdsSet()) {
+            int pos = (int) Math.round(book.getPageById(id).getLocation().getY() / 100) * 100;
+            ret.put(pos, id);
+            if (pos > maxPositionOfPage)
+                maxPositionOfPage = pos;
+        }
+        this.maxPositionOfPage = maxPositionOfPage;
+        return ret;
+    }
+
+    // TODO: verify if there isn't a better kind of event to use here
+    private void addListenersForRendering() {
+        Map<Integer, Integer> positions = getPageToPosition();
+        JViewport view = scrollPane.getViewport();
+        view.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int position = (int) Math.round(view.getViewPosition().y / 100) * 100;
+                for (int i = position - 2000; i <= maxPositionOfPage && i <= position + 2000; i += 100) {
+                    if (positions.containsKey(i)) {
+                        Page p = book.getPageById(positions.get(i));
+                        if (p != null && p.isBlank()) {
+                            p.showImage();
+                            System.out.printf("Image %d at position %d added.\n", positions.get(i), i);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 
     private String fetchPdfName() {
         File pdfDir = new File(GlobalConfig.getPdfFolder());
