@@ -66,6 +66,34 @@ public class Page extends JPanel {
         this.isBlank = false;
     }
 
+    // TODO: Get this shared code into some external function
+    public void hideImage() {
+        try {
+            BufferedImage img = ImageIO.read(pathToImage);
+            remove(label);
+            int width = img.getWidth();
+            int height = pageHeight = img.getHeight();
+            label = new JLabel(){
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    g.setColor(Color.LIGHT_GRAY);
+                    g.fillRect(0, 0, width, height);
+                }
+            };
+            label.setPreferredSize(new Dimension(width, height));
+            label.setAlignmentX(Component.CENTER_ALIGNMENT);
+            label.setBackground(Color.GREEN);
+        } catch (IOException e) {
+            System.out.println(pathToImage.getAbsolutePath());
+            e.printStackTrace();
+            return;
+        }
+        add(label);
+        label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
+        this.isBlank = true;
+    }
+
     public boolean isBlank() {
         return isBlank;
     } 

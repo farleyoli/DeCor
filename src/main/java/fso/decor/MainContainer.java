@@ -101,12 +101,34 @@ public class MainContainer extends JFrame {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int position = (int) Math.round(view.getViewPosition().y / 100) * 100;
+
+                // show pages
                 for (int i = position - 2000; i <= maxPositionOfPage && i <= position + 2000; i += 100) {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && p.isBlank()) {
                             p.showImage();
                             System.out.printf("Image %d at position %d added.\n", positions.get(i), i);
+                        }
+                    }
+                }
+                
+                // hide pages
+                for (int i = position + 2100; i <= maxPositionOfPage && i <= position + 3101; i += 100) {
+                    if (positions.containsKey(i)) {
+                        Page p = book.getPageById(positions.get(i));
+                        if (p != null && !p.isBlank()) {
+                            p.hideImage();
+                            System.out.printf("Image %d at position %d hidden.\n", positions.get(i), i);
+                        }
+                    }
+                }
+                for (int i = position - 2100; i >= 0 && i >= position - 3101; i -= 100) {
+                    if (positions.containsKey(i)) {
+                        Page p = book.getPageById(positions.get(i));
+                        if (p != null && !p.isBlank()) {
+                            p.hideImage();
+                            System.out.printf("Image %d at position %d hidden.\n", positions.get(i), i);
                         }
                     }
                 }
