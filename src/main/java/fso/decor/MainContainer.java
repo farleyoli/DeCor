@@ -108,7 +108,6 @@ public class MainContainer extends JFrame {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && p.isBlank()) {
                             p.showImage();
-                            System.out.printf("Image %d at position %d added.\n", positions.get(i), i);
                         }
                     }
                 }
@@ -119,7 +118,6 @@ public class MainContainer extends JFrame {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && !p.isBlank()) {
                             p.hideImage();
-                            System.out.printf("Image %d at position %d hidden.\n", positions.get(i), i);
                         }
                     }
                 }
@@ -128,7 +126,6 @@ public class MainContainer extends JFrame {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && !p.isBlank()) {
                             p.hideImage();
-                            System.out.printf("Image %d at position %d hidden.\n", positions.get(i), i);
                         }
                     }
                 }
@@ -244,7 +241,7 @@ public class MainContainer extends JFrame {
                 }
                 AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
                 handler.createDeckIfAbsent("DeCor::" + pdfName);
-                handler.transferMedia();
+                handler.transferMedia(book.getIdsToAdd());
                 for (Card card : book.getDeck().getCards()) {
                     handler.addCard(card.getAnkiRequest());
                 }

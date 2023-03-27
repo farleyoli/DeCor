@@ -76,16 +76,28 @@ public class AnkiConnectHandler {
         }
     }
 
-    public void transferMedia() {
+    private int getIdFromImageName(String filename) {
+        int startIndex = filename.lastIndexOf("_") + 1;
+        int endIndex = filename.lastIndexOf(".");
+        String numberStr = filename.substring(startIndex, endIndex);
+        int number = Integer.parseInt(numberStr);
+        return number;
+    }
+
+    public void transferMedia(Set<Integer> idsToAdd) {
         try {
             Set<String> imagesInAnki = getImageFileNames();
-            GlobalConfig config = GlobalConfig.getInstance(pdfHash);
             File baseFolder = new File(GlobalConfig.getImageFolder());
             for (final File file : Objects.requireNonNull(baseFolder.listFiles())) {
                 String shortName = file.getName().length() > 50 ?
                         file.getName().substring(file.getName().length() - 50) : file.getName();
                 String absoluteName = file.getAbsolutePath();
                 if (!imagesInAnki.contains(shortName) && !file.isDirectory() && absoluteName.contains(pdfHash) && absoluteName.contains(".jpg")) {
+                    int id = getIdFromImageName(file.getName());
+                    System.out.printf("Trying to add id %d to Anki\n", id);
+                    if (idsToAdd == null || !idsToAdd.contains(id))
+                        continue;
+                    System.out.printf("-----adding id %d to Anki\n", id);
                     String requestString = String.format("{\n" +
                             "    \"action\": \"storeMediaFile\",\n" +
                             "    \"version\": 6,\n" +

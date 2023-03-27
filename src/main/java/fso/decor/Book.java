@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Book extends JPanel {
@@ -63,6 +64,18 @@ public class Book extends JPanel {
             return idToPage.get(lastMarkedPage);
         }
         return null;
+    }
+
+    public Set<Integer> getIdsToAdd() {
+        Set<Integer> ret = new HashSet<Integer>();
+        for (int id : deck.getPageToCards().keySet()) {
+            for (int i = id - 5; i <= id + 5; i++) {
+                if (i < 0)
+                    continue;
+                ret.add(i);
+            }
+        }
+        return ret;
     }
 
     public Set<Integer> getIdsSet() {
