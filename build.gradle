@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.example'
-version '1.0'
+version '0.5'
 
 repositories {
     mavenCentral()
@@ -51,7 +51,7 @@ task customFatJar(type: Jar) {
     manifest {
         attributes 'Main-Class': 'fso.decor.Main'
     }
-    baseName = 'DeCor'
+    archiveBaseName = 'DeCor'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
