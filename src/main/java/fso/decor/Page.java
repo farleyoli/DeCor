@@ -50,9 +50,12 @@ public class Page extends JPanel {
     }
 
     public void showImage() {
+        if (!isBlank)
+            return;
         try {
             BufferedImage img = ImageIO.read(pathToImage);
             ImageIcon icon = new ImageIcon(img);
+            remove(label);
             remove(label);
             label = new JLabel(icon);
             label.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -70,6 +73,7 @@ public class Page extends JPanel {
     public void hideImage() {
         try {
             BufferedImage img = ImageIO.read(pathToImage);
+            remove(label);
             remove(label);
             int width = img.getWidth();
             int height = pageHeight = img.getHeight();

@@ -24,6 +24,10 @@ public class GlobalConfig {
         return LINUX_BASE_DIRECTORY + "pdf-files/"; //
     }
 
+    public static int getPageStep() {
+        return 300;
+    }
+
     public GlobalConfig() {
     }
 

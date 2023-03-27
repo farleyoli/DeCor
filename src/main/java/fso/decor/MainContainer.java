@@ -84,7 +84,8 @@ public class MainContainer extends JFrame {
         Map<Integer, Integer> ret = new HashMap<>(); // pages will be at least 10 separated
         int maxPositionOfPage = -1;
         for (int id : book.getIdsSet()) {
-            int pos = (int) Math.round(book.getPageById(id).getLocation().getY() / 100) * 100;
+            int pageStep = GlobalConfig.getPageStep();
+            int pos = (int) Math.round(book.getPageById(id).getLocation().getY() / pageStep) * pageStep;
             ret.put(pos, id);
             if (pos > maxPositionOfPage)
                 maxPositionOfPage = pos;
@@ -95,15 +96,16 @@ public class MainContainer extends JFrame {
 
     // TODO: verify if there isn't a better kind of event to use here
     private void addListenersForRendering() {
+        int pageStep = GlobalConfig.getPageStep();
         Map<Integer, Integer> positions = getPageToPosition();
         JViewport view = scrollPane.getViewport();
         view.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                int position = (int) Math.round(view.getViewPosition().y / 100) * 100;
+                int position = (int) Math.round(view.getViewPosition().y / pageStep) * pageStep;
 
                 // show pages
-                for (int i = position - 2000; i <= maxPositionOfPage && i <= position + 2000; i += 100) {
+                for (int i = position - 10 * pageStep; i <= maxPositionOfPage && i <= position + 10 * pageStep; i += pageStep) {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && p.isBlank()) {
@@ -113,7 +115,7 @@ public class MainContainer extends JFrame {
                 }
                 
                 // hide pages
-                for (int i = position + 2100; i <= maxPositionOfPage && i <= position + 3101; i += 100) {
+                for (int i = position + 11 * pageStep; i <= maxPositionOfPage && i <= position + 31 * pageStep; i += pageStep) {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && !p.isBlank()) {
@@ -121,7 +123,7 @@ public class MainContainer extends JFrame {
                         }
                     }
                 }
-                for (int i = position - 2100; i >= 0 && i >= position - 3101; i -= 100) {
+                for (int i = position - 11 * pageStep; i >= 0 && i >= position - 31 * pageStep; i -= pageStep) {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && !p.isBlank()) {
