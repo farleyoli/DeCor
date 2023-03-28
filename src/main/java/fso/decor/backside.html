@@ -12,13 +12,13 @@
             div.innerHTML = htmlString.trim();
 
             // Change this to div.childNodes to support multiple top-level nodes.
-                return div.firstChild;
+            return div.firstChild;
         }
 
 
         // front, back, beginningPage, beginningPercentage, endPage, endPercentage, id
         // Maybe eventually think of some resize event.
-            const frontDiv                  = document.getElementById('front');
+        const frontDiv                  = document.getElementById('front');
         const backDiv 			        = document.getElementById('back');
         const beginningPageDiv 		    = document.getElementById('beginningPage');
         const beginningPercentageDiv 	= document.getElementById('beginningPercentage');
@@ -27,15 +27,15 @@
         const idDiv 					= document.getElementById('id');
         const cardKeyDiv				= document.getElementById('cardKey');
 
-        const front 				= frontDiv.innerHTML;
-        const back					= backDiv.innerHTML
-        const beginningPage 		= parseInt(beginningPageDiv.innerHTML)-1;
-        const beginningPercentage	= parseFloat(beginningPercentageDiv.innerHTML);
-        const endPage 				= parseInt(endPageDiv.innerHTML)-1;
-        const endPercentage			= parseFloat(endPercentageDiv.innerHTML);
-        const id 					= idDiv.innerHTML;
-        const cardKey 				= cardKeyDiv.innerHTML;
-        const hash 					= cardKey.substring(0, cardKey.indexOf("_"));
+        const front 				    = frontDiv.innerHTML;
+        const back					    = backDiv.innerHTML
+        const beginningPage 		    = parseInt(beginningPageDiv.innerHTML)-1;
+        const beginningPercentage	    = parseFloat(beginningPercentageDiv.innerHTML);
+        const endPage 				    = parseInt(endPageDiv.innerHTML)-1;
+        const endPercentage			    = parseFloat(endPercentageDiv.innerHTML);
+        const id 					    = idDiv.innerHTML;
+        const cardKey 				    = cardKeyDiv.innerHTML;
+        const hash 					    = cardKey.substring(0, cardKey.indexOf("_"));
 
         let first = beginningPage;
         let last = endPage;

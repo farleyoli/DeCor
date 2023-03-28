@@ -51,7 +51,6 @@ public class PageMouseListener implements MouseListener {
                 String input = JOptionPane.showInputDialog(frame, "Input:");
                 String output = "";//JOptionPane.showInputDialog(frame, "Output:");
                 if (input == null) input = "";
-                if (output == null) output = "";
                 deck.addCard(input, output, initialPage, start, endPage, end);
                 Book book = page.getBook();
                 for (int id = initialPage; id <= endPage; id++) {

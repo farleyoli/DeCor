@@ -24,6 +24,61 @@ public class MainContainer extends JFrame {
     private final String pdfName;
     private int maxPositionOfPage;
 
+    public MainContainer() {
+        createDirectories();
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        pdfName = fetchPdfName();
+
+
+        source = new File(GlobalConfig.getPdfFolder() + pdfName + ".pdf");
+        destFolder = new File(GlobalConfig.getImageFolder());
+
+        var pair = createProgressBar("Creating images... please wait");
+        JProgressBar progressBar = pair.first;
+        ProgressBarContainer container = pair.second;
+        pdfManager = new PdfManager(source, destFolder, true, progressBar);
+        container.dispose();
+
+        String hash = pdfManager.getPdfHash();
+        GlobalConfig config = GlobalConfig.getInstance(hash);
+        config.setPdfName(pdfName);
+
+        book = new Book(hash);
+        book.setLayout(new BoxLayout(book, BoxLayout.Y_AXIS));
+        scrollPane = new JScrollPane(book);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(scrollPaneMouseIncrement);
+        getContentPane().add(scrollPane);
+
+        pair = createProgressBar("Setting up panel... please wait");
+        progressBar = pair.first;
+        container = pair.second;
+        setupPanel(progressBar);
+        container.dispose();
+
+        setKeybindings();
+
+        setSize(1366, 768);
+        setVisible(true);
+        addListenersForRendering();
+        scrollToLastMarkedPage();
+        getPageToPosition();
+    }
+
+    private Pair<JProgressBar, ProgressBarContainer> createProgressBar(String message) {
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(100);
+        progressBar.setValue(10);
+        progressBar.setStringPainted(true);
+        progressBar.setFont(new Font("Arial", Font.BOLD, 15));
+        ProgressBarContainer container = new ProgressBarContainer(progressBar, message);
+        container.setVisible(true);
+        Utils.centerContainer(container);
+        return new Pair<>(progressBar, container);
+    }
+
     private void createDirectories() {
         File linuxDirectory = new File(GlobalConfig.getBaseFolder());
         if (!linuxDirectory.exists())
@@ -38,37 +93,6 @@ public class MainContainer extends JFrame {
         }
     }
 
-    public MainContainer() {
-        createDirectories();
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        pdfName = fetchPdfName();
-
-        source = new File(GlobalConfig.getPdfFolder() + pdfName + ".pdf");
-        destFolder = new File(GlobalConfig.getImageFolder());
-        pdfManager = new PdfManager(source, destFolder, true);
-        String hash = pdfManager.getPdfHash();
-        GlobalConfig config = GlobalConfig.getInstance(hash);
-        config.setPdfName(pdfName);
-
-        book = new Book(hash);
-        book.setLayout(new BoxLayout(book, BoxLayout.Y_AXIS));
-        scrollPane = new JScrollPane(book);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(scrollPaneMouseIncrement);
-        getContentPane().add(scrollPane);
-
-        setupPanel();
-
-        setKeybindings();
-
-        setSize(800, 600);
-        setVisible(true);
-        addListenersForRendering();
-        scrollToLastMarkedPage();
-        getPageToPosition();
-    }
-
     private void scrollToLastMarkedPage() {
         Page lastMarkedPage = book.getLastMarkedPage();
         if (lastMarkedPage == null) // We need this for when no page is marked
@@ -78,10 +102,8 @@ public class MainContainer extends JFrame {
         view.setViewPosition(p);
     }
 
-    // TODO: Make sure we do not accept image heights smaller than 100
-    // TODO: Get rid of magic number
     private Map<Integer, Integer> getPageToPosition() {
-        Map<Integer, Integer> ret = new HashMap<>(); // pages will be at least 10 separated
+        Map<Integer, Integer> ret = new HashMap<>();
         int maxPositionOfPage = -1;
         for (int id : book.getIdsSet()) {
             int pageStep = GlobalConfig.getPageStep();
@@ -153,14 +175,25 @@ public class MainContainer extends JFrame {
                 choices[0]); // Initial choice
     }
 
-    private void setupPanel() {
+    private void setupPanel(JProgressBar bar) {
         String pdfHash = pdfManager.getPdfHash();
         File[] resources = destFolder.listFiles();
         if (resources == null)
             return;
         Arrays.sort(resources);
+
+        int total = 0;
+        // this first loop should be very cheap
         for (File file : resources) {
             if (file.getName().contains(pdfHash) && file.getName().endsWith(".jpg")) {
+                total++;
+            }
+        }
+        int count = 0;
+        for (File file : resources) {
+            if (file.getName().contains(pdfHash) && file.getName().endsWith(".jpg")) {
+                count++;
+                bar.setValue(100 * count / total);
                 book.addBlankPage(file);
             }
         }
@@ -180,7 +213,6 @@ public class MainContainer extends JFrame {
     }
 
     private void setActions() {
-
         scrollPane.getActionMap().put("move unit down", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {

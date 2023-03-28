@@ -12,6 +12,8 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.swing.JProgressBar;
+
 public class PdfManager {
     final private File source;
     final private File destFolder;
@@ -35,21 +37,23 @@ public class PdfManager {
         renderer = new PDFRenderer(pdfDocument);
     }
 
-    public PdfManager(File source, File destFolder, boolean convertImmediately) {
+    public PdfManager(File source, File destFolder, boolean convertImmediately, JProgressBar bar) {
         this(source, destFolder);
         if (!convertImmediately)
             return;
         try {
-            this.convertPdfToJpg();
+            this.convertPdfToJpg(bar);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    public void convertPdfToJpg() throws IOException {
+    public void convertPdfToJpg(JProgressBar bar) throws IOException {
         int dpi = 200;
-        for (int x = 0; x < pdfDocument.getNumberOfPages(); x++) {
+        int numberOfPages = pdfDocument.getNumberOfPages();
+        for (int x = 0; x < numberOfPages; x++) {
+            bar.setValue(100 * x / numberOfPages);
             String formatted = String.format(destFolder.getAbsolutePath() + "/" + hash + "_" + "%07d" + ".%s", x, "jpg");
             File page = new File(formatted);
             if (!page.exists()) {
