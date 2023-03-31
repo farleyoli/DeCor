@@ -87,7 +87,7 @@ public class AnkiConnectHandler {
     public void transferMedia(Set<Integer> idsToAdd) {
         try {
             Set<String> imagesInAnki = getImageFileNames();
-            File baseFolder = new File(GlobalConfig.getImageFolder());
+            File baseFolder = GlobalConfig.getImageFolder();
             for (final File file : Objects.requireNonNull(baseFolder.listFiles())) {
                 String shortName = file.getName().length() > 50 ?
                         file.getName().substring(file.getName().length() - 50) : file.getName();

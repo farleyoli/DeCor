@@ -31,9 +31,8 @@ public class MainContainer extends JFrame {
 
         pdfName = fetchPdfName();
 
-
-        source = new File(GlobalConfig.getPdfFolder() + pdfName + ".pdf");
-        destFolder = new File(GlobalConfig.getImageFolder());
+        source = new File(GlobalConfig.getPdfFolder(), pdfName + ".pdf");
+        destFolder = GlobalConfig.getImageFolder();
 
         var pair = createProgressBar("Creating images... please wait");
         JProgressBar progressBar = pair.first;
@@ -70,7 +69,7 @@ public class MainContainer extends JFrame {
         JProgressBar progressBar = new JProgressBar();
         progressBar.setMinimum(0);
         progressBar.setMaximum(100);
-        progressBar.setValue(10);
+        progressBar.setValue(1);
         progressBar.setStringPainted(true);
         progressBar.setFont(new Font("Arial", Font.BOLD, 15));
         ProgressBarContainer container = new ProgressBarContainer(progressBar, message);
@@ -80,14 +79,14 @@ public class MainContainer extends JFrame {
     }
 
     private void createDirectories() {
-        File linuxDirectory = new File(GlobalConfig.getBaseFolder());
+        File linuxDirectory = GlobalConfig.getBaseFolder();
         if (!linuxDirectory.exists())
             linuxDirectory.mkdirs();
-        File pdfDirectory = new File(GlobalConfig.getPdfFolder());
+        File pdfDirectory = GlobalConfig.getPdfFolder();
         if (!pdfDirectory.exists()) {
             pdfDirectory.mkdirs();
         }
-        File imageDirectory = new File(GlobalConfig.getImageFolder());
+        File imageDirectory = GlobalConfig.getImageFolder();
         if (!imageDirectory.exists()) {
             imageDirectory.mkdirs();
         }
@@ -157,9 +156,8 @@ public class MainContainer extends JFrame {
         });
     }
 
-
     private String fetchPdfName() {
-        File pdfDir = new File(GlobalConfig.getPdfFolder());
+        File pdfDir = GlobalConfig.getPdfFolder();
         ArrayList<String> choicesList = new ArrayList<>();
         for (final File fileEntry : pdfDir.listFiles()) {
             if (!fileEntry.isDirectory() && fileEntry.getName().endsWith(".pdf"))
@@ -168,9 +166,7 @@ public class MainContainer extends JFrame {
         String[] choices = new String[choicesList.size()];
         choicesList.toArray(choices);
         return (String) JOptionPane.showInputDialog(null, "Choose pdf to open",
-                "Choose pdf to open", JOptionPane.QUESTION_MESSAGE, null, // Use
-                // default
-                // icon
+                "Choose pdf to open", JOptionPane.QUESTION_MESSAGE, null,
                 choices, // Array of choices
                 choices[0]); // Initial choice
     }
@@ -197,7 +193,6 @@ public class MainContainer extends JFrame {
                 book.addBlankPage(file);
             }
         }
-
     }
 
     private void setKeybindings() {
@@ -256,7 +251,7 @@ public class MainContainer extends JFrame {
         scrollPane.getActionMap().put("save deck", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                File fileToSave = new File("src/main/resources/" + pdfManager.getPdfHash() + ".deck");
+                File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
                 try (PrintWriter out = new PrintWriter(fileToSave)) {
                     out.print(book.getDeck().getSerialiseString());
                     JOptionPane.showMessageDialog(null, "Saved file successfully!");

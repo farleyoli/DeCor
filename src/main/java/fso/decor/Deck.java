@@ -19,7 +19,7 @@ public class Deck {
         pageToCards = new HashMap<>();
         idToCard = new HashMap<>();
         id = 1;
-        File deckFile = new File(GlobalConfig.getImageFolder() + pdfHash + ".deck");
+        File deckFile = new File(GlobalConfig.getImageFolder(), pdfHash + ".deck");
         if (deckFile.exists()) {
             try (Scanner reader = new Scanner(deckFile)) {
                 id = Integer.parseInt(reader.nextLine());
