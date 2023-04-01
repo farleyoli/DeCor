@@ -21,14 +21,13 @@ public class GlobalConfig {
 
     public static File getOsBaseFolder() {
         String os = System.getProperty("os.name").toLowerCase();
-        return switch (os) {
-            case "windows" ->
-                getWindowsBaseFolder();
-            case "linux" ->
-                getLinuxBaseFolder();
-            default ->
-                getMacBaseFolder();
-        };
+        if (os.contains("win"))
+            return getWindowsBaseFolder();
+        if (os.contains("mac"))
+            return getMacBaseFolder();
+        if (os.contains("linux"))
+            return getLinuxBaseFolder();
+        return getLinuxBaseFolder(); // TODO: change here to folder picker
     }
 
     public static File getBaseFolder() {

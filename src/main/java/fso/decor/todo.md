@@ -6,6 +6,7 @@
 * Make input dialog better
 * Add buttons to do stuff in UI
 * Add title to main window (should be easy)
+* Fix OS detection function (use substrings with win and mac)
 * Release version 1
 
 * Fix Anki not going to blue mark when opening answer
