@@ -33,12 +33,14 @@ public class AnkiConnectHandler {
 
     public void addCard(String requestString) {
         try {
+            System.out.printf("Request string: %s\n", requestString);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(address))
                     .headers("Content-Type", "text/plain;charset=UTF-8")
                     .POST(HttpRequest.BodyPublishers.ofString(requestString))
                     .build();
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response);
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -94,10 +96,8 @@ public class AnkiConnectHandler {
                 String absoluteName = file.getAbsolutePath();
                 if (!imagesInAnki.contains(shortName) && !file.isDirectory() && absoluteName.contains(pdfHash) && absoluteName.contains(".jpg")) {
                     int id = getIdFromImageName(file.getName());
-                    System.out.printf("Trying to add id %d to Anki\n", id);
                     if (idsToAdd == null || !idsToAdd.contains(id))
                         continue;
-                    System.out.printf("-----adding id %d to Anki\n", id);
                     String requestString = String.format("{\n" +
                             "    \"action\": \"storeMediaFile\",\n" +
                             "    \"version\": 6,\n" +

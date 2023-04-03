@@ -1,4 +1,5 @@
 # TODO
+* Bug when endPage < begPage (click below before above)
 * Deal with LaTeX bug in input (JSON escape character)
 * Deal with case where user doesn't have any file in pdf folder (currently breaking for user)
 * Make AnkiConnect Create the Model for DeCor
