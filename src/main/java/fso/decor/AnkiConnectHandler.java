@@ -33,14 +33,13 @@ public class AnkiConnectHandler {
 
     public void addCard(String requestString) {
         try {
-            System.out.printf("Request string: %s\n", requestString);
+            // System.out.printf("Request string: %s\n", requestString);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(address))
                     .headers("Content-Type", "text/plain;charset=UTF-8")
                     .POST(HttpRequest.BodyPublishers.ofString(requestString))
                     .build();
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -114,7 +114,7 @@ public class Card {
                 "            ]\n" +
                 "        }\n" +
                 "    }\n" +
-                "}", "DeCor::" + config.getPdfName(), front, back, beginningPage, beginningPercentage, endPage, endPercentage,
+                "}", "DeCor::" + config.getPdfName(), Utils.quote(front), Utils.quote(back), beginningPage, beginningPercentage, endPage, endPercentage,
                 id, hash + "_" + id, "DeCor::" + config.getPdfName());
     }
 }
