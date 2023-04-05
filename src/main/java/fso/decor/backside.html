@@ -12,59 +12,65 @@
             div.innerHTML = htmlString.trim();
 
             // Change this to div.childNodes to support multiple top-level nodes.
-            return div.firstChild;
+                return div.firstChild;
         }
 
 
         // front, back, beginningPage, beginningPercentage, endPage, endPercentage, id
         // Maybe eventually think of some resize event.
-        const frontDiv                  = document.getElementById('front');
-        const backDiv 			        = document.getElementById('back');
-        const beginningPageDiv 		    = document.getElementById('beginningPage');
-        const beginningPercentageDiv 	= document.getElementById('beginningPercentage');
-        const endPageDiv 				= document.getElementById('endPage');
-        const endPercentageDiv 			= document.getElementById('endPercentage');
-        const idDiv 					= document.getElementById('id');
-        const cardKeyDiv				= document.getElementById('cardKey');
+        const frontDiv 						= document.getElementById('front');
+        const backDiv 					    = document.getElementById('back');
+        const beginningPageDiv 			    = document.getElementById('beginningPage');
+        const beginningPercentageDiv        = document.getElementById('beginningPercentage');
+        const endPageDiv 			        = document.getElementById('endPage');
+        const endPercentageDiv 		        = document.getElementById('endPercentage');
+        const idDiv 				        = document.getElementById('id');
+        const cardKeyDiv			        = document.getElementById('cardKey');
 
-        const front 				    = frontDiv.innerHTML;
-        const back					    = backDiv.innerHTML
-        const beginningPage 		    = parseInt(beginningPageDiv.innerHTML)-1;
-        const beginningPercentage	    = parseFloat(beginningPercentageDiv.innerHTML);
-        const endPage 				    = parseInt(endPageDiv.innerHTML)-1;
-        const endPercentage			    = parseFloat(endPercentageDiv.innerHTML);
-        const id 					    = idDiv.innerHTML;
-        const cardKey 				    = cardKeyDiv.innerHTML;
-        const hash 					    = cardKey.substring(0, cardKey.indexOf("_"));
+        const front 					    = frontDiv.innerHTML;
+        const back						    = backDiv.innerHTML
+        const beginningPage 				= parseInt(beginningPageDiv.innerHTML)-1;
+        const beginningPercentage	        = parseFloat(beginningPercentageDiv.innerHTML);
+        const endPage 					    = parseInt(endPageDiv.innerHTML)-1;
+        const endPercentage					= parseFloat(endPercentageDiv.innerHTML);
+        const id 						    = idDiv.innerHTML;
+        const cardKey 					    = cardKeyDiv.innerHTML;
+        const hash 						    = cardKey.substring(0, cardKey.indexOf("_"));
 
         let first = beginningPage;
         let last = endPage;
 
-        frontDiv.innerHTML 					= "";
-        backDiv.innerHTML 					= "";
-        beginningPageDiv.innerHTML 			= "";
+        const hasBack = back.length > 0 ? true : false;
+
+        frontDiv.innerHTML 				    = "";
+        backDiv.innerHTML 				    = "";
+        beginningPageDiv.innerHTML 		    = "";
         beginningPercentageDiv.innerHTML	= "";
-        endPageDiv.innerHTML 				= "";
-        endPercentageDiv.innerHTML 			= "";
-        idDiv.innerHTML 					= "";
-        cardKeyDiv.innerHTML 				= "";
-        //cardKeyDiv.innerHTML 				= hash;
+        endPageDiv.innerHTML 			    = "";
+        endPercentageDiv.innerHTML 		    = "";
+        idDiv.innerHTML 				    = "";
+        cardKeyDiv.innerHTML 			    = "";
+        //cardKeyDiv.innerHTML 							  = hash;
 
         const getImage = n => {
+            //875c5ac663662b27e4ea643fab62801141e103_0000047.jpg
             const subhash = hash.substring(hash.length - 38, hash.length);
             const imgName = subhash + "_" + n.toString().padStart(7, "0") + ".jpg";
 
-            const container     = document.createElement("div");
+            const container = document.createElement("div");
             container.className = "container";
 
             let svgHtml = '';
 
             svgHtml += "<div class=\"container\"><img src =\"";
-            svgHtml += imgName;
+            svgHtml += imgName; 
             if (n == beginningPage)
                 svgHtml += "\" id=\"firstP\"><svg id=answer width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
             else
                 svgHtml += "\" id=\"page" + n.toString() +"\"><svg width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
+
+            if (hasBack)
+                svgHtml = svgHtml.replaceAll('0,0,255','255,0,0');
 
             const svg = createElementFromHTML(svgHtml);
 
@@ -99,7 +105,7 @@
 
         for (i = beginningPage; i <= endPage; i++) {
             const container = getImage(i, hash);
-            if (i == beginningPage)
+            if ( i == beginningPage )
                 firstChild = container.childNodes[0].childNodes[1];
 
             [beg, end] = getBounds(i);
@@ -130,7 +136,10 @@
             }
         });
     }
+
+
 </script>
+
 
 {{front}}
 
@@ -146,9 +155,9 @@
 <div id="hue"></div>
 
 <div id="global">
-    <input id="addUp" type="button" value="Add Page" />
+    <input id="addUp" type="button" value="Add Page"" />
     <div id="content"></div>
-    <input id="addDown" type="button" value="Add Page" />
+    <input id="addDown" type="button" value="Add Page"" />
 </div>
 
-
+<br>{{back}}<br>
