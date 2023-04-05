@@ -18,39 +18,39 @@
 
         // front, back, beginningPage, beginningPercentage, endPage, endPercentage, id
         // Maybe eventually think of some resize event.
-        const frontDiv 						= document.getElementById('front');
-        const backDiv 					    = document.getElementById('back');
-        const beginningPageDiv 			    = document.getElementById('beginningPage');
+        const frontDiv                      = document.getElementById('front');
+        const backDiv                       = document.getElementById('back');
+        const beginningPageDiv              = document.getElementById('beginningPage');
         const beginningPercentageDiv        = document.getElementById('beginningPercentage');
-        const endPageDiv 			        = document.getElementById('endPage');
-        const endPercentageDiv 		        = document.getElementById('endPercentage');
-        const idDiv 				        = document.getElementById('id');
-        const cardKeyDiv			        = document.getElementById('cardKey');
+        const endPageDiv                    = document.getElementById('endPage');
+        const endPercentageDiv              = document.getElementById('endPercentage');
+        const idDiv                         = document.getElementById('id');
+        const cardKeyDiv                    = document.getElementById('cardKey');
 
-        const front 					    = frontDiv.innerHTML;
-        const back						    = backDiv.innerHTML
-        const beginningPage 				= parseInt(beginningPageDiv.innerHTML)-1;
-        const beginningPercentage	        = parseFloat(beginningPercentageDiv.innerHTML);
-        const endPage 					    = parseInt(endPageDiv.innerHTML)-1;
-        const endPercentage					= parseFloat(endPercentageDiv.innerHTML);
-        const id 						    = idDiv.innerHTML;
-        const cardKey 					    = cardKeyDiv.innerHTML;
-        const hash 						    = cardKey.substring(0, cardKey.indexOf("_"));
+        const front                         = frontDiv.innerHTML;
+        const back                          = backDiv.innerHTML
+        const beginningPage                 = parseInt(beginningPageDiv.innerHTML)-1;
+        const beginningPercentage           = parseFloat(beginningPercentageDiv.innerHTML);
+        const endPage                       = parseInt(endPageDiv.innerHTML)-1;
+        const endPercentage                 = parseFloat(endPercentageDiv.innerHTML);
+        const id                            = idDiv.innerHTML;
+        const cardKey                       = cardKeyDiv.innerHTML;
+        const hash                          = cardKey.substring(0, cardKey.indexOf("_"));
 
         let first = beginningPage;
         let last = endPage;
 
-        const hasBack = back.length > 0 ? true : false;
+        const hasBack = back.length > 0; // The version before was ugly -- sorry :)
 
-        frontDiv.innerHTML 				    = "";
-        backDiv.innerHTML 				    = "";
-        beginningPageDiv.innerHTML 		    = "";
-        beginningPercentageDiv.innerHTML	= "";
-        endPageDiv.innerHTML 			    = "";
-        endPercentageDiv.innerHTML 		    = "";
-        idDiv.innerHTML 				    = "";
-        cardKeyDiv.innerHTML 			    = "";
-        //cardKeyDiv.innerHTML 							  = hash;
+        frontDiv.innerHTML                  = "";
+        backDiv.innerHTML                   = "";
+        beginningPageDiv.innerHTML          = "";
+        beginningPercentageDiv.innerHTML    = "";
+        endPageDiv.innerHTML                = "";
+        endPercentageDiv.innerHTML          = "";
+        idDiv.innerHTML                     = "";
+        cardKeyDiv.innerHTML                = "";
+        //cardKeyDiv.innerHTML                            = hash;
 
         const getImage = n => {
             //875c5ac663662b27e4ea643fab62801141e103_0000047.jpg
@@ -80,7 +80,7 @@
         };
 
         const placeCard = (container, beg, end) => {
-            // image:	document.getElementById('hue').innerText = container.childNodes[0].childNodes[0];
+            // image:   document.getElementById('hue').innerText = container.childNodes[0].childNodes[0];
             // svg: document.getElementById('hue').innerText = container.childNodes[0].childNodes[1];
             // rect: document.getElementById('hue').innerText = container.childNodes[0].childNodes[1].childNodes[0];
             // document.getElementById('hue').innerText = container.childNodes[0].childNodes[1].outerHTML;
