@@ -38,7 +38,7 @@ public class GlobalConfig {
     }
 
     public static File getPdfFolder() {
-        File ret = new File(getBaseFolder(), "pdf-files");
+        File ret = new File(getBaseFolder(), "pdf-files-test");
         if (!ret.exists())
             ret.mkdir();
         return ret;

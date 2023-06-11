@@ -3,11 +3,14 @@ package fso.decor;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,7 +24,7 @@ public class MainContainer extends JFrame {
     final private PdfManager pdfManager;
 
     final private int scrollPaneMouseIncrement = 18;
-    private final String pdfName;
+    private String pdfName = "";
     private int maxPositionOfPage;
 
     public MainContainer() {
@@ -31,7 +34,8 @@ public class MainContainer extends JFrame {
 
         pdfName = fetchPdfName();
 
-        source = new File(GlobalConfig.getPdfFolder(), pdfName + ".pdf");
+        source = getPdfFile();
+
         destFolder = GlobalConfig.getImageFolder();
 
         var pair = createProgressBar("Creating images... please wait");
@@ -63,6 +67,39 @@ public class MainContainer extends JFrame {
         addListenersForRendering();
         scrollToLastMarkedPage();
         getPageToPosition();
+    }
+
+    private File getPdfFile() {
+        File dest = new File(GlobalConfig.getPdfFolder(), pdfName + ".pdf");
+        if (dest.exists())
+            return dest;
+
+        JOptionPane.showMessageDialog(null, "Please select a PDF file.");
+        // choose a pdf file from somewhere else
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files", "pdf");
+        fileChooser.setFileFilter(filter);
+
+        int result = fileChooser.showOpenDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String filepath = fileChooser.getSelectedFile().getAbsolutePath();
+            File source = new File(filepath);
+            pdfName = fileChooser.getSelectedFile().getName().replace(".pdf", "");
+            dest = new File(GlobalConfig.getPdfFolder(), pdfName + ".pdf");
+            try {
+                Files.copy(source.toPath(), dest.toPath(),StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(1);
+            }
+            return dest;
+        }
+
+        System.err.println("No valid pdf file was provided for the program to work with");
+        System.exit(1);
+
+        return null;
     }
 
     private Pair<JProgressBar, ProgressBarContainer> createProgressBar(String message) {
@@ -123,7 +160,7 @@ public class MainContainer extends JFrame {
         view.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                int position = (int) Math.round(view.getViewPosition().y / pageStep) * pageStep;
+                int position = Math.round(view.getViewPosition().y / pageStep) * pageStep;
 
                 // show pages
                 for (int i = position - 10 * pageStep; i <= maxPositionOfPage && i <= position + 10 * pageStep; i += pageStep) {
@@ -162,6 +199,10 @@ public class MainContainer extends JFrame {
         for (final File fileEntry : pdfDir.listFiles()) {
             if (!fileEntry.isDirectory() && fileEntry.getName().endsWith(".pdf"))
                 choicesList.add(fileEntry.getName().substring(0, fileEntry.getName().length() - 4));
+        }
+        if (choicesList.size() == 0) {
+            getPdfFile();
+            return pdfName;
         }
         String[] choices = new String[choicesList.size()];
         choicesList.toArray(choices);
