@@ -43,17 +43,31 @@ public class PageMouseListener implements MouseListener {
         switch (state.getState()) {
             case READY -> state.setCardStart(getPercentagePosition(e), page.getPageNumber());
             case WAIT_CARD_END -> {
-                int initialPage = state.getPage();
-                int endPage = page.getPageNumber();
-                double start = state.setCardEnd();
-                double end = getPercentagePosition(e);
-                JFrame frame = new JFrame();
-                String input = JOptionPane.showInputDialog(frame, "Input:");
-                String output = "";//JOptionPane.showInputDialog(frame, "Output:");
+                int startPage   = state.getPage();
+                int endPage     = page.getPageNumber();
+                double start    = state.setCardEnd();
+                double end      = getPercentagePosition(e);
+                JFrame frame    = new JFrame();
+                String input    = JOptionPane.showInputDialog(frame, "Input:");
+                String output   = "";//JOptionPane.showInputDialog(frame, "Output:");
+
+                // Ensure that start is start is before end
+                // not doing this in a separate function because Java is a horrible language 
+                if (endPage < startPage || endPage == startPage && end < start) {
+                    int intTemp = startPage;
+                    startPage = endPage;
+                    endPage = intTemp;
+                    double doubleTemp = start;
+                    start = end;
+                    end = doubleTemp;
+                }
+
                 if (input == null) input = "";
-                deck.addCard(input, output, initialPage, start, endPage, end);
+
+                deck.addCard(input, output, startPage, start, endPage, end);
+
                 Book book = page.getBook();
-                for (int id = initialPage; id <= endPage; id++) {
+                for (int id = startPage; id <= endPage; id++) {
                     Page page = book.getPageById(id);
                     page.repaintScrollBar();
                 }

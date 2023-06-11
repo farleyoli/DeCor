@@ -7,4 +7,5 @@ gradle/
 build
 gradle
 gradlew
+jdt.ls-java-project/
 gradlew.bat
