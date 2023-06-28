@@ -116,7 +116,7 @@ public class Card {
                 "            ]\n" +
                 "        }\n" +
                 "    }\n" +
-                "}", "DeCor::" + config.getPdfName(), modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
+                "}", GlobalConfig.getDeckName() + "::" + config.getPdfName(), modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
                 beginningPage, beginningPercentage, endPage, endPercentage, id, hash + "_" + id, "DeCor::" + config.getPdfName());
     }
 }

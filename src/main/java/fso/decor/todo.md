@@ -1,5 +1,4 @@
 # TODO
-* Make AnkiConnect Create the Model for DeCor
 * Create images lazily (and don't save them to a folder unless User wants it so)
 * Make input dialog better
 * Add buttons to do stuff in UI (including to add pdf files)
@@ -15,6 +14,7 @@
 * Throttle change event
 
 # DONE
+* Make AnkiConnect Create the Model for DeCor
 * Deal with case where user doesn't have any file in pdf folder (currently breaking for user)
 * Bug when endPage < begPage (click below before above)
 * Add support to an arbitrary number of pages natively

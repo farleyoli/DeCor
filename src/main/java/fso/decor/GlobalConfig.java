@@ -52,6 +52,10 @@ public class GlobalConfig {
         return "testDeCor";
     }
 
+    public static String getDeckName() {
+        return "DeCor";
+    }
+
     public static File getLinuxBaseFolder() {
         String xdgDataHome = System.getenv("XDG_DATA_HOME");
         if (xdgDataHome == null || xdgDataHome.isEmpty())

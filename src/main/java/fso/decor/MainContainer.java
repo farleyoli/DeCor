@@ -320,7 +320,7 @@ public class MainContainer extends JFrame {
                 AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
                 String modelName = GlobalConfig.getModelName();
                 handler.createModelIfAbsent(modelName);
-                handler.createDeckIfAbsent("DeCor::" + pdfName);
+                handler.createDeckIfAbsent(GlobalConfig.getDeckName() + "::" + pdfName);
                 handler.transferMedia(book.getIdsToAdd());
                 for (Card card : book.getDeck().getCards()) {
                     handler.addCard(card.getAnkiRequest(modelName));
