@@ -1,5 +1,7 @@
 package fso.decor;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 public class Card {
     private final String front;
     private final String back;
@@ -81,7 +83,7 @@ public class Card {
         return ret.toString();
     }
 
-    public String getAnkiRequest() {
+    public String getAnkiRequest(String modelName) {
         GlobalConfig config = GlobalConfig.getInstance(hash);
         return String.format("{\n" +
                 "    \"action\": \"addNote\",\n" +
@@ -89,7 +91,7 @@ public class Card {
                 "    \"params\": {\n" +
                 "        \"note\": {\n" +
                 "            \"deckName\": \"%s\",\n" +
-                "            \"modelName\": \"DeCor\",\n" +
+                "            \"modelName\": \"%s\",\n" +
                 "            \"fields\": {\n" +
                 "                \"front\": \"%s\",\n" +
                 "                \"back\": \"%s\",\n" +
@@ -114,7 +116,7 @@ public class Card {
                 "            ]\n" +
                 "        }\n" +
                 "    }\n" +
-                "}", "DeCor::" + config.getPdfName(), Utils.quote(front), Utils.quote(back), beginningPage, beginningPercentage, endPage, endPercentage,
-                id, hash + "_" + id, "DeCor::" + config.getPdfName());
+                "}", "DeCor::" + config.getPdfName(), modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
+                beginningPage, beginningPercentage, endPage, endPercentage, id, hash + "_" + id, "DeCor::" + config.getPdfName());
     }
 }

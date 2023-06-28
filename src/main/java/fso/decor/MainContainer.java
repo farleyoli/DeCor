@@ -309,17 +309,21 @@ public class MainContainer extends JFrame {
                 if (dialogResult != JOptionPane.YES_OPTION) {
                     return;
                 }
+
                 File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
                 try (PrintWriter out = new PrintWriter(fileToSave)) {
                     out.print(book.getDeck().getSerialiseString());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
+
                 AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
+                String modelName = GlobalConfig.getModelName();
+                handler.createModelIfAbsent(modelName);
                 handler.createDeckIfAbsent("DeCor::" + pdfName);
                 handler.transferMedia(book.getIdsToAdd());
                 for (Card card : book.getDeck().getCards()) {
-                    handler.addCard(card.getAnkiRequest());
+                    handler.addCard(card.getAnkiRequest(modelName));
                 }
                 JOptionPane.showMessageDialog(null,
                         "Synced with Anki and saved file successfully!");

@@ -42,42 +42,42 @@
 
         const hasBack = back.length > 0; // The version before was ugly -- sorry :)
 
-        frontDiv.innerHTML                  = "";
-        backDiv.innerHTML                   = "";
-        beginningPageDiv.innerHTML          = "";
-        beginningPercentageDiv.innerHTML    = "";
-        endPageDiv.innerHTML                = "";
-        endPercentageDiv.innerHTML          = "";
-        idDiv.innerHTML                     = "";
-        cardKeyDiv.innerHTML                = "";
-        //cardKeyDiv.innerHTML                            = hash;
+    frontDiv.innerHTML                  = "";
+    backDiv.innerHTML                   = "";
+    beginningPageDiv.innerHTML          = "";
+    beginningPercentageDiv.innerHTML    = "";
+    endPageDiv.innerHTML                = "";
+    endPercentageDiv.innerHTML          = "";
+    idDiv.innerHTML                     = "";
+    cardKeyDiv.innerHTML                = "";
+    //cardKeyDiv.innerHTML                            = hash;
 
-        const getImage = n => {
-            //875c5ac663662b27e4ea643fab62801141e103_0000047.jpg
-            const subhash = hash.substring(hash.length - 38, hash.length);
-            const imgName = subhash + "_" + n.toString().padStart(7, "0") + ".jpg";
+    const getImage = n => {
+        //875c5ac663662b27e4ea643fab62801141e103_0000047.jpg
+        const subhash = hash.substring(hash.length - 38, hash.length);
+        const imgName = subhash + "_" + n.toString().padStart(7, "0") + ".jpg";
 
-            const container = document.createElement("div");
-            container.className = "container";
+        const container = document.createElement("div");
+        container.className = "container";
 
-            let svgHtml = '';
+        let svgHtml = '';
 
-            svgHtml += "<div class=\"container\"><img src =\"";
-            svgHtml += imgName; 
-            if (n == beginningPage)
-                svgHtml += "\" id=\"firstP\"><svg id=answer width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
-            else
-                svgHtml += "\" id=\"page" + n.toString() +"\"><svg width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
+        svgHtml += "<div class=\"container\"><img src =\"";
+        svgHtml += imgName; 
+        if (n == beginningPage)
+            svgHtml += "\" id=\"firstP\"><svg id=answer width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
+        else
+            svgHtml += "\" id=\"page" + n.toString() +"\"><svg width=\"100%\" height=\"0\" class=\"rectangle\"><rect width=\"100%\" height=\"100%\" style=\"fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)\" /></svg><div>";
 
-            if (hasBack)
-                svgHtml = svgHtml.replaceAll('0,0,255','255,0,0');
+        if (hasBack)
+            svgHtml = svgHtml.replaceAll('0,0,255','255,0,0');
 
-            const svg = createElementFromHTML(svgHtml);
+        const svg = createElementFromHTML(svgHtml);
 
-            container.appendChild(svg);
+        container.appendChild(svg);
 
-            return container;
-        };
+        return container;
+    };
 
         const placeCard = (container, beg, end) => {
             // image:   document.getElementById('hue').innerText = container.childNodes[0].childNodes[0];
@@ -124,8 +124,8 @@
             cont.insertBefore(getImage(--first), cont.firstChild);
         }
 
-        document.addEventListener('keypress', function(event) {
-            var key = event.key || event .keyCode;
+        let keyPressHandler = (event) => {
+            var key = event.key || event.keyCode;
 
             if (key == 'g'){
                 firstChild.scrollIntoView({
@@ -134,10 +134,26 @@
                     inline: 'center'
                 });
             }
-        });
+        }
+
+        let keyPressHandlerNew = (event) => {
+            var key = event.key || event.keyCode;
+
+            if (key == 'n'){
+                document.getElementById("content").appendChild(getImage(++last));
+            }
+            if (key == 'n'){
+                cont = document.getElementById("content");
+                cont.insertBefore(getImage(--first), cont.firstChild);
+            }
+        }
+
+        if (document.deCorListener)
+            document.removeEventListener('keypress', document.deCorListener);
+        document.deCorListener = keyPressHandlerNew;
+        document.addEventListener('keypress', keyPressHandler);
+        document.addEventListener('keypress', keyPressHandlerNew);
     }
-
-
 </script>
 
 
@@ -161,3 +177,4 @@
 </div>
 
 <br>{{back}}<br>
+

@@ -48,6 +48,10 @@ public class GlobalConfig {
         return 300;
     }
 
+    public static String getModelName() {
+        return "testDeCor";
+    }
+
     public static File getLinuxBaseFolder() {
         String xdgDataHome = System.getenv("XDG_DATA_HOME");
         if (xdgDataHome == null || xdgDataHome.isEmpty())

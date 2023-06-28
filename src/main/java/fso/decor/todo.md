@@ -2,7 +2,7 @@
 * Make AnkiConnect Create the Model for DeCor
 * Create images lazily (and don't save them to a folder unless User wants it so)
 * Make input dialog better
-* Add buttons to do stuff in UI
+* Add buttons to do stuff in UI (including to add pdf files)
 * Add title to main window (should be easy)
 * Release version 1
 

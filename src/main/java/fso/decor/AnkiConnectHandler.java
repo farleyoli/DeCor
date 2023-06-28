@@ -1,5 +1,7 @@
 package fso.decor;
 
+import org.apache.commons.text.StringEscapeUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -33,7 +35,6 @@ public class AnkiConnectHandler {
 
     public void addCard(String requestString) {
         try {
-            // System.out.printf("Request string: %s\n", requestString);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(address))
                     .headers("Content-Type", "text/plain;charset=UTF-8")
@@ -144,6 +145,58 @@ public class AnkiConnectHandler {
             }
         } catch (URISyntaxException | IOException | InterruptedException e) {
             System.out.printf("There was a problem creating the deck %s if it was absent.\n", deckName);
+            throw new RuntimeException(e);
+        }
+    }
+    public void createModelIfAbsent(String modelName) {
+        this.modelName = modelName;
+        try {
+            String requestString = "{\n" +
+                    "    \"action\": \"modelNames\",\n" +
+                    "    \"version\": 6\n" +
+                    "}";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(address))
+                    .headers("Content-Type", "text/plain;charset=UTF-8")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestString))
+                    .build();
+
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONObject jo = new JSONObject(response.body());
+
+            if (jo.get("error").toString().equals("null") && !jo.get("result").toString().equals("null")) {
+                boolean isDeckPresent = Utils.JSONArrayContains((JSONArray) jo.get("result"), modelName);
+                if (isDeckPresent) {
+                    System.out.printf("%s Model is already present. Not creating it.\n", modelName);
+                    return;
+                }
+            } else {
+                System.out.println("There was an error fetching the names of existing Models.");
+                return;
+            }
+
+            String cssContent = StringEscapeUtils.escapeJson(Utils.readAndEscape("./src/main/resources/styling.css"));
+            String frontContent = StringEscapeUtils.escapeJson(Utils.readAndEscape("./src/main/resources/frontside.html"));
+            String backContent = StringEscapeUtils.escapeJson(Utils.readAndEscape("./src/main/resources/backside.html"));
+            requestString = String.format(Utils.readAndEscape("./src/main/resources/createModelRequest.txt"),
+                    modelName, cssContent, modelName, frontContent, backContent);
+
+            // requestString = StringEscapeUtils.escapeJson(requestString);
+
+            request = HttpRequest.newBuilder()
+                    .uri(new URI(address))
+                    .headers("Content-Type", "text/plain;charset=UTF-8")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestString))
+                    .build();
+
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            jo = new JSONObject(response.body());
+            if (jo.get("error").toString().equals("null")) {
+                System.out.println("Deck already existed or was successfully newly created.");
+            }
+
+        } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,0 +1,17 @@
+{
+    "action": "createModel",
+    "version": 6,
+    "params": {
+        "modelName": "%s",
+        "inOrderFields": ["cardKey", "front", "back", "beginningPage", "beginningPercentage", "endPage", "endPercentage", "id"],
+        "css": "%s",
+        "isCloze": false,
+        "cardTemplates": [
+            {
+                "Name": "%s card template",
+                "Front": "%s",
+                "Back": "%s"
+            }
+        ]
+    }
+}
