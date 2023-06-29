@@ -17,6 +17,9 @@ dependencies {
     implementation 'org.apache.pdfbox:pdfbox:2.0.27'
     // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox-tools
     implementation 'org.apache.pdfbox:pdfbox-tools:2.0.27'
+    implementation 'org.apache.commons:commons-text:1.10.0'
+    // https://mvnrepository.com/artifact/org.apache.pdfbox/jbig2-imageio
+    implementation group: 'org.apache.pdfbox', name: 'jbig2-imageio', version: '3.0.4'
     // https://mvnrepository.com/artifact/org.json/json
     implementation group: 'org.json', name: 'json', version: '20220924'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
