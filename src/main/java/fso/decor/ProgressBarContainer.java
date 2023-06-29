@@ -18,6 +18,6 @@ public class ProgressBarContainer extends JFrame {
         getContentPane().add(messageLabel);
         getContentPane().add(progressBar);
         setResizable(false);
-        setSize(320, 90);
+        setSize(420, 90);
     }
 }

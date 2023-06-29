@@ -3,6 +3,7 @@
 * Make input dialog better
 * Add buttons to do stuff in UI (including to add pdf files)
 * Add title to main window (should be easy)
+* Don't do anything when we press cancel in the card creating dialog
 * Release version 1
 
 * Separate .deck from images in image folder

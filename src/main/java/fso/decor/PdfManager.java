@@ -50,17 +50,22 @@ public class PdfManager {
     }
 
     public void convertPdfToJpg(JProgressBar bar) throws IOException {
-        int dpi = 200;
         int numberOfPages = pdfDocument.getNumberOfPages();
         for (int x = 0; x < numberOfPages; x++) {
             bar.setValue(100 * x / numberOfPages);
-            String formatted = String.format(destFolder.getAbsolutePath() + "/" + hash + "_" + "%07d" + ".%s", x, "jpg");
-            File page = new File(formatted);
-            if (!page.exists()) {
-                BufferedImage bImage = renderer.renderImageWithDPI(x, dpi, ImageType.RGB);
-                ImageIOUtil.writeImage(bImage, formatted, dpi);
-            }
+            convertPdfPageToJpg(x);
         }
+    }
+
+    public File convertPdfPageToJpg(int pageNumber) throws IOException {
+        int dpi = 200;
+        String formatted = String.format(destFolder.getAbsolutePath() + "/" + hash + "_" + "%07d" + ".%s", pageNumber, "jpg");
+        File page = new File(formatted);
+        if (!page.exists()) {
+            BufferedImage bImage = renderer.renderImageWithDPI(pageNumber, dpi, ImageType.RGB);
+            ImageIOUtil.writeImage(bImage, formatted, dpi);
+        }
+        return page;
     }
 
     public String getPdfHash() {

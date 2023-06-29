@@ -38,7 +38,7 @@ public class MainContainer extends JFrame {
 
         destFolder = GlobalConfig.getImageFolder();
 
-        var pair = createProgressBar("Creating images... please wait");
+        var pair = createProgressBar("Creating images (done only once)...please wait");
         JProgressBar progressBar = pair.first;
         ProgressBarContainer container = pair.second;
         pdfManager = new PdfManager(source, destFolder, true, progressBar);
