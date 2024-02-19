@@ -15,41 +15,48 @@ public class Page extends JPanel {
     private final Book book;
     private boolean isBlank;
     private File pathToImage;
+    private boolean isImageCreated;
 
-    public Page(File pathToImage, int pageNumber, Book book) {
+    public Page(int pageNumber, Book book) {
+        // don't create the image yet, as it takes time
+
+        isImageCreated = false;
         this.isBlank = true;
         this.book = book;
-        this.pathToImage = pathToImage;
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
         this.pageNumber = pageNumber;
-        try {
-            BufferedImage img = ImageIO.read(pathToImage);
-            int width = img.getWidth();
-            int height = pageHeight = img.getHeight();
-            label = new JLabel(){
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    g.setColor(Color.LIGHT_GRAY);
-                    g.fillRect(0, 0, width, height);
-                }
-            };
-            label.setPreferredSize(new Dimension(width, height));
-            label.setAlignmentX(Component.CENTER_ALIGNMENT);
-            label.setBackground(Color.GREEN);
-        } catch (IOException e) {
-            System.out.println(pathToImage.getAbsolutePath());
-            e.printStackTrace();
-            return;
-        }
+        PdfManager pdfManager = book.getPdfManager();
+        var pair = pdfManager.getWidthAndHeight(pageNumber - 1);
+        int width = pair.first;
+        int height = pageHeight = pair.second;
+
+        label = new JLabel(){
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.setColor(Color.LIGHT_GRAY);
+                g.fillRect(0, 0, width, height);
+            }
+        };
+        label.setPreferredSize(new Dimension(width, height));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setBackground(Color.GREEN);
+
         bar = new ScrollBar(pageHeight, this);
         add(bar);
         add(label);
         label.addMouseListener(new PageMouseListener(this, book.getDeck(), book.getState()));
-        this.pageNumber = pageNumber;
+    }
+
+    private File createImage() {
+        return book.getPdfManager().getPage(pageNumber - 1);
     }
 
     public void showImage() {
+        if (!isImageCreated) {
+            pathToImage = createImage();
+            isImageCreated = true;
+        }
         if (!isBlank)
             return;
         try {

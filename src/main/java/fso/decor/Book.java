@@ -12,29 +12,26 @@ public class Book extends JPanel {
     private final Deck deck;
     private final BookState state;
     private final HashMap<Integer, Page> idToPage;
-    private final String pdfHash;
+    private PdfManager pdfManager;
 
     public Book(String pdfHash) {
-        this.pdfHash = pdfHash;
         deck = new Deck(pdfHash);
         lastPage = 1;
         state = new BookState();
         idToPage = new HashMap<>();
     }
 
+    public PdfManager getPdfManager() {
+        return pdfManager;
+    }
+
     public int getLastPage() {
         return lastPage;
     }
 
-    public void addPage(File pathToImage) {
-        Page page = new Page(pathToImage, lastPage, this);
-        idToPage.put(lastPage, page);
-        lastPage++;
-        add(page);
-    }
-
-    public void addBlankPage(File pathToImage, int startPage) {
-        Page page = new Page(pathToImage, lastPage, this);
+    public void addBlankPage(int startPage, PdfManager pdfManager) {
+        this.pdfManager = pdfManager;
+        Page page = new Page(lastPage, this);
         idToPage.put(lastPage, page);
         lastPage++;
         add(page);
@@ -42,8 +39,8 @@ public class Book extends JPanel {
             page.showImage();
     }
 
-    public void addBlankPage(File pathToImage) {
-        addBlankPage(pathToImage, 1);
+    public void addBlankPage(PdfManager pdfManager) {
+        addBlankPage(1, pdfManager);
     }
 
     public Deck getDeck() {

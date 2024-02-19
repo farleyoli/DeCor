@@ -12,7 +12,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,11 +37,7 @@ public class MainContainer extends JFrame {
 
         destFolder = GlobalConfig.getImageFolder();
 
-        var pair = createProgressBar("Creating images (done only once)...please wait");
-        JProgressBar progressBar = pair.first;
-        ProgressBarContainer container = pair.second;
-        pdfManager = new PdfManager(source, destFolder, true, progressBar);
-        container.dispose();
+        pdfManager = new PdfManager(source, destFolder);
 
         String hash = pdfManager.getPdfHash();
         GlobalConfig config = GlobalConfig.getInstance(hash);
@@ -54,9 +49,9 @@ public class MainContainer extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(scrollPaneMouseIncrement);
         getContentPane().add(scrollPane);
 
-        pair = createProgressBar("Setting up panel... please wait");
-        progressBar = pair.first;
-        container = pair.second;
+        var pair = createProgressBar("Setting up panel... please wait");
+        JProgressBar progressBar = pair.first;
+        ProgressBarContainer container = pair.second;
         setupPanel(progressBar);
         container.dispose();
 
@@ -212,27 +207,13 @@ public class MainContainer extends JFrame {
                 choices[0]); // Initial choice
     }
 
+    // TODO: no need for progress bar anymore
     private void setupPanel(JProgressBar bar) {
-        String pdfHash = pdfManager.getPdfHash();
-        File[] resources = destFolder.listFiles();
-        if (resources == null)
-            return;
-        Arrays.sort(resources);
+        int total = pdfManager.getNumberOfPages();
 
-        int total = 0;
-        // this first loop should be very cheap
-        for (File file : resources) {
-            if (file.getName().contains(pdfHash) && file.getName().endsWith(".jpg")) {
-                total++;
-            }
-        }
-        int count = 0;
-        for (File file : resources) {
-            if (file.getName().contains(pdfHash) && file.getName().endsWith(".jpg")) {
-                count++;
-                bar.setValue(100 * count / total);
-                book.addBlankPage(file);
-            }
+        for (int pageNumber = 0; pageNumber < total; pageNumber++) {
+            book.addBlankPage(pdfManager);
+            bar.setValue(100 * pageNumber / total);
         }
     }
 

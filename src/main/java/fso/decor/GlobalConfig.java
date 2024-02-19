@@ -48,6 +48,10 @@ public class GlobalConfig {
         return 300;
     }
 
+    public static int getDpi() {
+        return 200;
+    }
+
     public static String getModelName() {
         return "testDeCor";
     }

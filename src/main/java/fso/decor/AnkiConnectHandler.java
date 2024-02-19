@@ -73,7 +73,7 @@ public class AnkiConnectHandler {
             ret.addAll((Collection<? extends String>) jo.toMap().get("result"));
             return ret;
         } catch (URISyntaxException | InterruptedException | IOException e) {
-            System.out.println("Something went wrong when getting files names");
+            System.out.println("Something went wrong when getting file names");
             return new HashSet<>();
         }
     }

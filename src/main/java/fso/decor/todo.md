@@ -1,11 +1,13 @@
 # TODO
-* Create images lazily (and don't save them to a folder unless User wants it so)
+* Create cards automatically
+* use additional thread to create images instead of blocking scroll
 * Make input dialog better
 * Add buttons to do stuff in UI (including to add pdf files)
 * Add title to main window (should be easy)
 * Don't do anything when we press cancel in the card creating dialog
 * Release version 1
 
+* Do not save images to folder if user does not want
 * Separate .deck from images in image folder
 * Fix Anki not going to blue mark when opening answer
 * Zoom into pages!
@@ -15,6 +17,7 @@
 * Throttle change event
 
 # DONE
+* Create images lazily 
 * Make AnkiConnect Create the Model for DeCor
 * Deal with case where user doesn't have any file in pdf folder (currently breaking for user)
 * Bug when endPage < begPage (click below before above)

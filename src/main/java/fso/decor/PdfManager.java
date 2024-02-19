@@ -1,6 +1,7 @@
 package fso.decor;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
@@ -19,6 +20,7 @@ public class PdfManager {
     final private File destFolder;
     final private PDDocument pdfDocument;
     final private PDFRenderer renderer;
+    final private PDPageTree pageTree;
     private String hash;
 
     public PdfManager(File source, File destFolder) {
@@ -34,7 +36,30 @@ public class PdfManager {
 
         getPdfHash();
 
+        pageTree = pdfDocument.getPages(); // .get(10).getBBox()
         renderer = new PDFRenderer(pdfDocument);
+    }
+
+    public Pair<Integer, Integer> getWidthAndHeight(int pageNumber) {
+        double dpi = (double) GlobalConfig.getDpi();
+        int dpiRatio = 72;
+        var boundingBox = pageTree.get(pageNumber).getBBox();
+        return new Pair<Integer,Integer>((int) (boundingBox.getWidth() * (dpi / dpiRatio)), (int) (boundingBox.getHeight() * (dpi/dpiRatio)));
+    }
+
+    public File getPage(int page) {
+        if (page < 0 || page > getNumberOfPages())
+            return null;
+        try {
+            return convertPdfPageToJpg(page);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getNumberOfPages() {
+        return pdfDocument.getNumberOfPages();
     }
 
     public PdfManager(File source, File destFolder, boolean convertImmediately, JProgressBar bar) {
@@ -58,7 +83,7 @@ public class PdfManager {
     }
 
     public File convertPdfPageToJpg(int pageNumber) throws IOException {
-        int dpi = 200;
+        int dpi = GlobalConfig.getDpi();
         String formatted = String.format(destFolder.getAbsolutePath() + "/" + hash + "_" + "%07d" + ".%s", pageNumber, "jpg");
         File page = new File(formatted);
         if (!page.exists()) {
@@ -66,6 +91,12 @@ public class PdfManager {
             ImageIOUtil.writeImage(bImage, formatted, dpi);
         }
         return page;
+    }
+
+    public File getImageFile(int pageNumber) {
+        // get page without actually making it
+        String formatted = String.format(destFolder.getAbsolutePath() + "/" + hash + "_" + "%07d" + ".%s", pageNumber, "jpg");
+        return new File(formatted);
     }
 
     public String getPdfHash() {
