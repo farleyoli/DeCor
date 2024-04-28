@@ -52,13 +52,19 @@ public class Page extends JPanel {
         return book.getPdfManager().getPage(pageNumber - 1);
     }
 
-    public void showImage() {
+    public void setIsBlank(boolean value) {
+        isBlank = false;
+    }
+
+    public synchronized void showImage() {
         if (!isImageCreated) {
             pathToImage = createImage();
             isImageCreated = true;
         }
+
         if (!isBlank)
             return;
+
         try {
             BufferedImage img = ImageIO.read(pathToImage);
             ImageIcon icon = new ImageIcon(img);

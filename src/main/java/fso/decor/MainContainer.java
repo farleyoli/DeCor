@@ -57,6 +57,7 @@ public class MainContainer extends JFrame {
 
         setKeybindings();
 
+        // TODO: set this in the config
         setSize(1366, 768);
         setVisible(true);
         addListenersForRendering();
@@ -150,6 +151,7 @@ public class MainContainer extends JFrame {
     // TODO: verify if there isn't a better kind of event to use here
     private void addListenersForRendering() {
         int pageStep = GlobalConfig.getPageStep();
+        int imageFileBufferSize = GlobalConfig.getImageFileBufferSize();
         Map<Integer, Integer> positions = getPageToPosition();
         JViewport view = scrollPane.getViewport();
         view.addChangeListener(new ChangeListener() {
@@ -157,18 +159,31 @@ public class MainContainer extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 int position = Math.round(view.getViewPosition().y / pageStep) * pageStep;
 
+                // TODO: this looks okay now, but check that the multi-threading logic is working well better later
+
                 // show pages
-                for (int i = position - 10 * pageStep; i <= maxPositionOfPage && i <= position + 10 * pageStep; i += pageStep) {
+                for (int i = position - imageFileBufferSize * pageStep;
+                     i <= maxPositionOfPage && i <= position + imageFileBufferSize * pageStep;
+                     i += pageStep)
+                {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
+                        // System.out.println("Before check");  // DEBUG
                         if (p != null && p.isBlank()) {
-                            p.showImage();
+                            // if I don't spawn new threads, scrolling is blocked when these are running
+                            new Thread(() -> {
+                                // System.out.println("After check");  // DEBUG
+                                p.showImage();
+                            }).start();
                         }
                     }
                 }
                 
-                // hide pages
-                for (int i = position + 11 * pageStep; i <= maxPositionOfPage && i <= position + 31 * pageStep; i += pageStep) {
+                // hide pages after
+                for (int i = position + (imageFileBufferSize + 1) * pageStep;
+                     i <= maxPositionOfPage && i <= position + (3 * imageFileBufferSize + 1) * pageStep;
+                     i += pageStep)
+                {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && !p.isBlank()) {
@@ -176,7 +191,12 @@ public class MainContainer extends JFrame {
                         }
                     }
                 }
-                for (int i = position - 11 * pageStep; i >= 0 && i >= position - 31 * pageStep; i -= pageStep) {
+
+                // hide pages before
+                for (int i = position - (imageFileBufferSize + 1) * pageStep;
+                     i >= 0 && i >= position - (3 * imageFileBufferSize + 1) * pageStep;
+                     i -= pageStep)
+                {
                     if (positions.containsKey(i)) {
                         Page p = book.getPageById(positions.get(i));
                         if (p != null && !p.isBlank()) {

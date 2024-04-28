@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 
 public class GlobalConfig {
-    private static final HashMap<String, GlobalConfig> map = new HashMap<>();
-    private String pdfName = "";
+    private static final HashMap<String, GlobalConfig> map = new HashMap<>(); private String pdfName = "";
+    private static boolean isTest = true;
 
     public static GlobalConfig getInstance(String hash) {
         map.putIfAbsent(hash, new GlobalConfig());
@@ -13,7 +13,7 @@ public class GlobalConfig {
     }
 
     public static File getImageFolder() {
-        File ret = new File(getBaseFolder(), "images");
+        File ret = new File(getBaseFolder(), isTest ? "images-test" : "images");
         if (!ret.exists())
             ret.mkdir();
         return ret;
@@ -27,7 +27,8 @@ public class GlobalConfig {
             return getMacBaseFolder();
         if (os.contains("linux"))
             return getLinuxBaseFolder();
-        return getLinuxBaseFolder(); // TODO: change here to folder picker
+        // TODO: change here to folder picker
+        return getLinuxBaseFolder(); 
     }
 
     public static File getBaseFolder() {
@@ -38,7 +39,11 @@ public class GlobalConfig {
     }
 
     public static File getPdfFolder() {
-        File ret = new File(getBaseFolder(), "pdf-files-test");
+        File ret;
+        if (isTest)
+            ret = new File(getBaseFolder(), "pdf-files-test");
+        else
+            ret = new File(getBaseFolder(), "pdf-files");
         if (!ret.exists())
             ret.mkdir();
         return ret;
@@ -53,7 +58,8 @@ public class GlobalConfig {
     }
 
     public static String getModelName() {
-        return "testDeCor";
+        String ret = isTest ? "testDeCor" : "DeCor";
+        return ret;
     }
 
     public static String getDeckName() {
@@ -95,6 +101,10 @@ public class GlobalConfig {
             ret.mkdirs();
 
         return ret;
+    }
+
+    public static int getImageFileBufferSize() {
+        return 15;
     }
 
     public GlobalConfig() {
