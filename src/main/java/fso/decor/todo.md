@@ -1,13 +1,11 @@
 # TODO
-* Make input dialog better
 * Add buttons to do stuff in UI (including to add pdf files)
 * Add title to main window (should be easy)
-* Don't do anything when we press cancel in the card creating dialog
 * Write Github README
 
 * Release Version 1
 
-* Do not save images to folder if user does not want
+* Do not save images to folder if user does not want (option to delete image files on request?)
 * Do not use blank pages and just leave the 
 * Separate .deck from images in image folder
 * Fix Anki not going to blue mark when opening answer
@@ -18,6 +16,8 @@
 * Throttle change event
 
 # DONE
+* Don't do anything when we press cancel in the card creating dialog
+* Make input dialog better
 * Use additional thread to create images instead of blocking scroll
 * Create images lazily 
 * Make AnkiConnect Create the Model for DeCor

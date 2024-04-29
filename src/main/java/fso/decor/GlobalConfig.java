@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.HashMap;
 
 public class GlobalConfig {
-    private static final HashMap<String, GlobalConfig> map = new HashMap<>(); private String pdfName = "";
+    private static final HashMap<String, GlobalConfig> map = new HashMap<>();
+    private String pdfName = "";
     private static boolean isTest = true;
 
     public static GlobalConfig getInstance(String hash) {
