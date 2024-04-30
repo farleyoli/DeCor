@@ -27,11 +27,20 @@ public class MainContainer extends JFrame {
     private int maxPositionOfPage;
 
     public MainContainer() {
+        this(null);
+    }
+
+    public MainContainer(String pdfNameParam) {  // null indicates we have to pick it
+        setupMenuBar();
+
         createDirectories();
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        pdfName = fetchPdfName();
+        if (pdfNameParam == null)
+            pdfName = fetchPdfName(false);
+        else
+            pdfName = pdfNameParam;
 
         source = getPdfFile();
 
@@ -66,11 +75,16 @@ public class MainContainer extends JFrame {
     }
 
     private File getPdfFile() {
+        return getPdfFile(true);
+    }
+
+    private File getPdfFile(boolean showDialog) {
         File dest = new File(GlobalConfig.getPdfFolder(), pdfName + ".pdf");
         if (dest.exists())
             return dest;
 
-        JOptionPane.showMessageDialog(null, "Please select a PDF file.");
+        if (showDialog)
+            JOptionPane.showMessageDialog(null, "Please select a PDF file.");
         // choose a pdf file from somewhere else
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files", "pdf");
@@ -208,7 +222,11 @@ public class MainContainer extends JFrame {
         });
     }
 
-    private String fetchPdfName() {
+    private String fetchPdfName(boolean forceOpen) {
+        if (forceOpen) {
+            getPdfFile(false);
+            return pdfName;
+        }
         File pdfDir = GlobalConfig.getPdfFolder();
         ArrayList<String> choicesList = new ArrayList<>();
         for (final File fileEntry : pdfDir.listFiles()) {
@@ -293,42 +311,95 @@ public class MainContainer extends JFrame {
         scrollPane.getActionMap().put("save deck", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
-                try (PrintWriter out = new PrintWriter(fileToSave)) {
-                    out.print(book.getDeck().getSerialiseString());
-                    JOptionPane.showMessageDialog(null, "Saved file successfully!");
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+                saveDeck();
             }
         });
         scrollPane.getActionMap().put("sync anki", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int dialogResult = JOptionPane.showConfirmDialog(null,
-                        "Would you like to Sync with Anki?");
-                if (dialogResult != JOptionPane.YES_OPTION) {
-                    return;
-                }
-
-                File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
-                try (PrintWriter out = new PrintWriter(fileToSave)) {
-                    out.print(book.getDeck().getSerialiseString());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-                AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
-                String modelName = GlobalConfig.getModelName();
-                handler.createModelIfAbsent(modelName);
-                handler.createDeckIfAbsent(GlobalConfig.getDeckName() + "::" + pdfName);
-                handler.transferMedia(book.getIdsToAdd());
-                for (Card card : book.getDeck().getCards()) {
-                    handler.addCard(card.getAnkiRequest(modelName));
-                }
-                JOptionPane.showMessageDialog(null,
-                        "Synced with Anki and saved file successfully!");
+                saveAndSyncAnki();
             }
         });
     }
+
+    private void saveDeck() {
+        File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
+        try (PrintWriter out = new PrintWriter(fileToSave)) {
+            out.print(book.getDeck().getSerialiseString());
+            JOptionPane.showMessageDialog(null, "Saved file successfully!");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void saveAndSyncAnki() {
+        int dialogResult = JOptionPane.showConfirmDialog(null,
+                "Would you like to Sync with Anki?");
+        if (dialogResult != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
+        try (PrintWriter out = new PrintWriter(fileToSave)) {
+            out.print(book.getDeck().getSerialiseString());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
+        String modelName = GlobalConfig.getModelName();
+        handler.createModelIfAbsent(modelName);
+        handler.createDeckIfAbsent(GlobalConfig.getDeckName() + "::" + pdfName);
+        handler.transferMedia(book.getIdsToAdd());
+        for (Card card : book.getDeck().getCards()) {
+            handler.addCard(card.getAnkiRequest(modelName));
+        }
+        JOptionPane.showMessageDialog(null,
+                "Synced with Anki and saved file successfully!");
+    }
+
+    private void setupMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem openItem = new JMenuItem("Open");
+        JMenuItem exitItem = new JMenuItem("Exit");
+        fileMenu.add(openItem);
+        // fileMenu.addSeparator();  // might need this in the future
+        fileMenu.add(exitItem);
+
+        JMenu editMenu = new JMenu("Action");
+        JMenuItem saveItem = new JMenuItem("Save");
+        JMenuItem saveAndSyncItem = new JMenuItem("Save and sync with Anki");
+        editMenu.add(saveItem);
+        editMenu.add(saveAndSyncItem);
+
+        menuBar.add(fileMenu);
+        menuBar.add(editMenu);
+
+        openItem.addActionListener(e -> {
+            dispose(); // Close/delete the current JFrame
+            EventQueue.invokeLater(() -> {
+                pdfName = "";
+                getPdfFile(false);
+                MainContainer newMainContainer = new MainContainer(pdfName);
+                newMainContainer.setVisible(true);
+            });
+        });
+
+        exitItem.addActionListener(e -> {
+            System.exit(0);
+        });
+
+        saveItem.addActionListener(e -> {
+            saveDeck();
+        });
+
+        saveAndSyncItem.addActionListener(e -> {
+            saveAndSyncAnki();
+        });
+
+        setJMenuBar(menuBar);
+    }
+
 }

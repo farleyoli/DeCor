@@ -9,9 +9,6 @@ import java.awt.event.KeyEvent;
 class QuestionTextField extends JTextArea {
     public QuestionTextField(int width, int height) {
         super();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        width = screenSize.width / 3;
-        height = screenSize.height / 3;
         setFont(new Font("SansSerif", Font.PLAIN, 17));
         setLineWrap(true);
         setWrapStyleWord(true);
