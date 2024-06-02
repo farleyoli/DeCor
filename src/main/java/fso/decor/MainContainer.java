@@ -322,6 +322,7 @@ public class MainContainer extends JFrame {
         });
     }
 
+    // TODO: don't throw here, show a dialog or something 
     private void saveDeck() {
         File fileToSave = new File(GlobalConfig.getImageFolder(), pdfManager.getPdfHash() + ".deck");
         try (PrintWriter out = new PrintWriter(fileToSave)) {

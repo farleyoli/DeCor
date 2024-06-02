@@ -8,7 +8,7 @@
 
 * Release Version 1
 
-* Add buttons to do stuff in UI (including to add pdf files)
+* Read configuration from a txt file
 * Separate .deck from images in image folder
 * Do not save images to folder if user does not want (option to delete image files on request?)
 * Do not use blank pages and just leave the 
@@ -21,6 +21,7 @@
 * Throttle change event
 
 # DONE
+* Add buttons to do stuff in UI (including to add pdf files)
 * Don't do anything when we press cancel in the card creating dialog
 * Make input dialog better
 * Use additional thread to create images instead of blocking scroll

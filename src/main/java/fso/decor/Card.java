@@ -14,8 +14,8 @@ public class Card {
     public Card (String front, String back, int beginningPage, double beginningPercentage, int endPage,
                            double endPercentage, int id, String hash) {
         assert hash != null;
-        this.front = front;
-        this.back = back;
+        this.front = front.replace("\n", "<br>");
+        this.back = back.replace("\n", "<br>");
         this.beginningPage = beginningPage;
         this.beginningPercentage = beginningPercentage;
         this.endPage = endPage;

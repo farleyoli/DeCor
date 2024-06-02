@@ -59,3 +59,29 @@ task customFatJar(type: Jar) {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+task downloadSources {
+    doLast {
+        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each { artifact ->
+            if (artifact.type == 'jar') {
+                def componentId = artifact.moduleVersion.id
+                def result = dependencies.createArtifactResolutionQuery()
+                    .forModule(componentId.group, componentId.name, componentId.version)
+                    .withArtifacts(MavenModule, MavenArtifact)
+                    .execute()
+
+                result.resolvedComponents.each { component ->
+                    component.getArtifacts(MavenArtifact).each { artifactResult ->
+                        if (artifactResult.type == 'source' && artifactResult.file.exists()) {
+                            copy {
+                                from artifactResult.file
+                                into "${buildDir}/libs/sources"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
