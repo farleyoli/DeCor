@@ -39,14 +39,19 @@ public class Deck {
     }
 
     public void addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,
-                        double endPercentage, int id) {
+                        double endPercentage, int id, boolean isNew) {
         assert beginningPage <= endPage;
-        Card card = new Card(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, pdfHash);
+        Card card = new Card(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, pdfHash, isNew);
         for (int page = beginningPage; page <= endPage; page++) {
             pageToCards.putIfAbsent(page, new HashSet<>());
             pageToCards.get(page).add(card);
         }
         idToCard.put(id, card);
+    }
+
+    public void addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,
+                        double endPercentage, int id) {
+        addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, true);
     }
 
     public void addCardFromSerialiseString(String serialiseString) {
@@ -60,7 +65,7 @@ public class Deck {
         int endPage = Integer.parseInt(elements[4]);
         double endPercentage = Double.parseDouble(elements[5]);
         int id = Integer.parseInt(elements[6]);
-        addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id);
+        addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, false);
     }
 
     public ArrayList<Double> renderScrollBar(int page) {

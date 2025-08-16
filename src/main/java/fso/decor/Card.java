@@ -11,8 +11,10 @@ public class Card {
     private final double endPercentage;
     private final int id;
     private final String hash;
+    private boolean isNew;
+
     public Card (String front, String back, int beginningPage, double beginningPercentage, int endPage,
-                           double endPercentage, int id, String hash) {
+                           double endPercentage, int id, String hash, boolean isNew) {
         assert hash != null;
         this.front = front.replace("\n", "<br>");
         this.back = back.replace("\n", "<br>");
@@ -22,6 +24,20 @@ public class Card {
         this.endPercentage = endPercentage;
         this.id = id;
         this.hash = hash;
+        this.isNew = isNew;
+    }
+
+    public Card (String front, String back, int beginningPage, double beginningPercentage, int endPage,
+                           double endPercentage, int id, String hash) {
+        this(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, hash, true);
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean value) {
+        isNew = value;
     }
 
     public int getBeginningPage() {
@@ -116,7 +132,7 @@ public class Card {
                 "            ]\n" +
                 "        }\n" +
                 "    }\n" +
-                "}", GlobalConfig.getDeckName() + "::" + config.getPdfName(), modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
-                beginningPage, beginningPercentage, endPage, endPercentage, id, hash + "_" + id, "DeCor::" + config.getPdfName());
+                "}", GlobalConfig.getDeckName(config.getPdfName()), modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
+                beginningPage, beginningPercentage, endPage, endPercentage, id, hash + "_" + id, GlobalConfig.getDeckName(config.getPdfName()));
     }
 }

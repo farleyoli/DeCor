@@ -2,11 +2,12 @@ package fso.decor;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 public class GlobalConfig {
     private static final HashMap<String, GlobalConfig> map = new HashMap<>();
     private String pdfName = "";
-    private static boolean isTest = true;
+    private static boolean isTest = false;
 
     public static GlobalConfig getInstance(String hash) {
         map.putIfAbsent(hash, new GlobalConfig());
@@ -63,8 +64,8 @@ public class GlobalConfig {
         return ret;
     }
 
-    public static String getDeckName() {
-        return "DeCor";
+    public static String getDeckName(String pdfName) {
+        return pdfName;  // let's use pdfName for now
     }
 
     public static File getLinuxBaseFolder() {

@@ -8,6 +8,7 @@
 
 * Release Version 1
 
+* Select cut of part of image for question field
 * Read configuration from a txt file
 * Separate .deck from images in image folder
 * Do not save images to folder if user does not want (option to delete image files on request?)
