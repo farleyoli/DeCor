@@ -1,9 +1,9 @@
 # TODO
 * Sanitize string in question when it has breaklines
-* Add title to main window (should be easy)
+
 * Create card directly, instead of having to press ctrl+A
-* Deal with case when Anki is not connected (show status continually?)
-* Add command to delete pdf files (and corresponding images [and decks?])
+
+
 * Write Github README
 
 * Release Version 1
@@ -22,6 +22,9 @@
 * Throttle change event
 
 # DONE
+* Add title to main window (should be easy)
+* Add command to delete pdf files (and corresponding images and decks)
+* Deal with case when Anki is not connected (show status continually)
 * Add buttons to do stuff in UI (including to add pdf files)
 * Don't do anything when we press cancel in the card creating dialog
 * Make input dialog better

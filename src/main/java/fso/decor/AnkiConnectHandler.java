@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -31,6 +32,23 @@ public class AnkiConnectHandler {
     public AnkiConnectHandler(String hash) {
         this.pdfHash = hash;
         client = HttpClient.newHttpClient();
+    }
+
+    public boolean isConnected() {
+        try {
+            String requestString = "{\"action\": \"version\", \"version\": 6}";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(address))
+                    .headers("Content-Type", "text/plain;charset=UTF-8")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestString))
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (ConnectException e) {
+            return false;
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            return false;
+        }
     }
 
     public void addCard(String requestString) {

@@ -25,6 +25,7 @@ public class MainContainer extends JFrame {
     final private int scrollPaneMouseIncrement = 18;
     private String pdfName = "";
     private int maxPositionOfPage;
+    private JLabel ankiStatusLabel;
 
     public MainContainer() {
         this(null);
@@ -67,11 +68,16 @@ public class MainContainer extends JFrame {
         setKeybindings();
 
         // TODO: set this in the config
+        setTitle("DeCor - " + pdfName);
         setSize(1366, 768);
         setVisible(true);
         addListenersForRendering();
         scrollToLastMarkedPage();
         getPageToPosition();
+
+        updateAnkiStatus();
+        Timer ankiTimer = new Timer(10000, e -> updateAnkiStatus());
+        ankiTimer.start();
     }
 
     private File getPdfFile() {
@@ -334,6 +340,15 @@ public class MainContainer extends JFrame {
     }
 
     private void saveAndSyncAnki() {
+        AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
+
+        if (!handler.isConnected()) {
+            JOptionPane.showMessageDialog(this,
+                    "Cannot connect to Anki.\nMake sure Anki is running and the AnkiConnect plugin is installed.",
+                    "Anki not connected", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         int dialogResult = JOptionPane.showConfirmDialog(null,
                 "Would you like to Sync with Anki?");
         if (dialogResult != JOptionPane.YES_OPTION) {
@@ -347,7 +362,6 @@ public class MainContainer extends JFrame {
             throw new RuntimeException(ex);
         }
 
-        AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
         String modelName = GlobalConfig.getModelName();
         handler.createModelIfAbsent(modelName);
         handler.createDeckIfAbsent(GlobalConfig.getDeckName(pdfName));
@@ -363,14 +377,64 @@ public class MainContainer extends JFrame {
                 "Synced with Anki and saved file successfully!");
     }
 
+    private void updateAnkiStatus() {
+        new Thread(() -> {
+            boolean connected = AnkiConnectHandler.getInstance(pdfManager != null ?
+                    pdfManager.getPdfHash() : "").isConnected();
+            SwingUtilities.invokeLater(() -> {
+                if (connected) {
+                    ankiStatusLabel.setText("Anki: Connected");
+                    ankiStatusLabel.setForeground(new Color(0, 128, 0));
+                } else {
+                    ankiStatusLabel.setText("Anki: Not connected");
+                    ankiStatusLabel.setForeground(Color.RED);
+                }
+            });
+        }).start();
+    }
+
+    private void deletePdfAndData() {
+        int result = JOptionPane.showConfirmDialog(this,
+                "Delete \"" + pdfName + "\" and all its images and deck data?\nThis cannot be undone.",
+                "Delete PDF and data", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (result != JOptionPane.YES_OPTION)
+            return;
+
+        String hash = pdfManager.getPdfHash();
+
+        // Delete the PDF file
+        File pdfFile = new File(GlobalConfig.getPdfFolder(), pdfName + ".pdf");
+        if (pdfFile.exists())
+            pdfFile.delete();
+
+        // Delete image files and deck file
+        File imageFolder = GlobalConfig.getImageFolder();
+        File[] files = imageFolder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().startsWith(hash)) {
+                    file.delete();
+                }
+            }
+        }
+
+        // Reopen with PDF picker
+        dispose();
+        EventQueue.invokeLater(() -> {
+            new MainContainer();
+        });
+    }
+
     private void setupMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("File");
         JMenuItem openItem = new JMenuItem("Open");
+        JMenuItem deleteItem = new JMenuItem("Delete PDF and data");
         JMenuItem exitItem = new JMenuItem("Exit");
         fileMenu.add(openItem);
-        // fileMenu.addSeparator();  // might need this in the future
+        fileMenu.add(deleteItem);
+        fileMenu.addSeparator();
         fileMenu.add(exitItem);
 
         JMenu editMenu = new JMenu("Action");
@@ -382,6 +446,14 @@ public class MainContainer extends JFrame {
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
 
+        menuBar.add(Box.createHorizontalGlue());
+        ankiStatusLabel = new JLabel();
+        ankiStatusLabel.setFont(ankiStatusLabel.getFont().deriveFont(Font.PLAIN, 11f));
+        ankiStatusLabel.setText("Anki: Checking...");
+        ankiStatusLabel.setForeground(Color.GRAY);
+        menuBar.add(ankiStatusLabel);
+        menuBar.add(Box.createHorizontalStrut(10));
+
         openItem.addActionListener(e -> {
             dispose(); // Close/delete the current JFrame
             EventQueue.invokeLater(() -> {
@@ -390,6 +462,10 @@ public class MainContainer extends JFrame {
                 MainContainer newMainContainer = new MainContainer(pdfName);
                 newMainContainer.setVisible(true);
             });
+        });
+
+        deleteItem.addActionListener(e -> {
+            deletePdfAndData();
         });
 
         exitItem.addActionListener(e -> {
