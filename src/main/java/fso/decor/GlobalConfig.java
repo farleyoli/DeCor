@@ -8,6 +8,7 @@ public class GlobalConfig {
     private static final HashMap<String, GlobalConfig> map = new HashMap<>();
     private String pdfName = "";
     private static boolean isTest = false;
+    private static float dialogOpacity = 1.0f;
 
     public static GlobalConfig getInstance(String hash) {
         map.putIfAbsent(hash, new GlobalConfig());
@@ -118,5 +119,13 @@ public class GlobalConfig {
 
     public void setPdfName(String pdfName) {
         this.pdfName = pdfName;
+    }
+
+    public static float getDialogOpacity() {
+        return dialogOpacity;
+    }
+
+    public static void setDialogOpacity(float opacity) {
+        dialogOpacity = Math.max(0.1f, Math.min(1.0f, opacity));
     }
 }

@@ -423,8 +423,28 @@ public class MainContainer extends JFrame {
         editMenu.add(saveItem);
         editMenu.add(saveAndSyncItem);
 
+        JMenu settingsMenu = new JMenu("Settings");
+        JMenuItem opacityItem = new JMenuItem("Dialog transparency...");
+        settingsMenu.add(opacityItem);
+
+        opacityItem.addActionListener(e -> {
+            int currentPercent = Math.round((1f - GlobalConfig.getDialogOpacity()) * 100);
+            JSlider slider = new JSlider(0, 90, currentPercent);
+            slider.setMajorTickSpacing(10);
+            slider.setMinorTickSpacing(5);
+            slider.setPaintTicks(true);
+            slider.setPaintLabels(true);
+            int result = JOptionPane.showConfirmDialog(this, slider,
+                    "Dialog transparency (%)", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                float opacity = 1f - slider.getValue() / 100f;
+                GlobalConfig.setDialogOpacity(opacity);
+            }
+        });
+
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
+        menuBar.add(settingsMenu);
 
         menuBar.add(Box.createHorizontalGlue());
         ankiStatusLabel = new JLabel();

@@ -91,7 +91,23 @@ public class PageMouseListener implements MouseListener {
 
         JOptionPane pane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
 
-        JDialog dialog = pane.createDialog(null, "Create Card");
+        float opacity = GlobalConfig.getDialogOpacity();
+        JDialog dialog;
+        if (opacity < 1.0f) {
+            dialog = new JDialog((Frame) null, "Create Card", true);
+            dialog.setUndecorated(true);
+            dialog.setContentPane(pane);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setOpacity(opacity);
+            pane.addPropertyChangeListener(e -> {
+                if (dialog.isVisible() && e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)) {
+                    dialog.setVisible(false);
+                }
+            });
+        } else {
+            dialog = pane.createDialog(null, "Create Card");
+        }
 
         // focus on first text field
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -101,7 +117,7 @@ public class PageMouseListener implements MouseListener {
         });
 
         dialog.setVisible(true);
-        
+
         Object selectedValue = pane.getValue();
 
         int result = (selectedValue == null ? JOptionPane.CLOSED_OPTION : (Integer) selectedValue);
