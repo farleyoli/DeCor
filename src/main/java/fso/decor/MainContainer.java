@@ -59,11 +59,7 @@ public class MainContainer extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(scrollPaneMouseIncrement);
         getContentPane().add(scrollPane);
 
-        var pair = createProgressBar("Setting up panel... please wait");
-        JProgressBar progressBar = pair.first;
-        ProgressBarContainer container = pair.second;
-        setupPanel(progressBar);
-        container.dispose();
+        setupPanel();
 
         setKeybindings();
 
@@ -116,19 +112,6 @@ public class MainContainer extends JFrame {
         System.exit(1);
 
         return null;
-    }
-
-    private Pair<JProgressBar, ProgressBarContainer> createProgressBar(String message) {
-        JProgressBar progressBar = new JProgressBar();
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(100);
-        progressBar.setValue(1);
-        progressBar.setStringPainted(true);
-        progressBar.setFont(new Font("Arial", Font.BOLD, 15));
-        ProgressBarContainer container = new ProgressBarContainer(progressBar, message);
-        container.setVisible(true);
-        Utils.centerContainer(container);
-        return new Pair<>(progressBar, container);
     }
 
     private void createDirectories() {
@@ -251,13 +234,10 @@ public class MainContainer extends JFrame {
                 choices[0]); // Initial choice
     }
 
-    // TODO: no need for progress bar anymore
-    private void setupPanel(JProgressBar bar) {
+    private void setupPanel() {
         int total = pdfManager.getNumberOfPages();
-
         for (int pageNumber = 0; pageNumber < total; pageNumber++) {
             book.addBlankPage(pdfManager);
-            bar.setValue(100 * pageNumber / total);
         }
     }
 

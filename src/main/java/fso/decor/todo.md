@@ -1,12 +1,6 @@
 # TODO
-* Sanitize string in question when it has breaklines
-
-* Create card directly, instead of having to press ctrl+A
 
 
-* Write Github README
-
-* Release Version 1
 
 * Select cut of part of image for question field
 * Read configuration from a txt file
@@ -22,6 +16,10 @@
 * Throttle change event
 
 # DONE
+* Write Github README
+* Release Version 1
+* Create card directly, instead of having to press ctrl+A
+* Sanitize string in question when it has breaklines
 * Add title to main window (should be easy)
 * Add command to delete pdf files (and corresponding images and decks)
 * Deal with case when Anki is not connected (show status continually)

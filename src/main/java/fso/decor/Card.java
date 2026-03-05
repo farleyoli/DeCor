@@ -16,8 +16,8 @@ public class Card {
     public Card (String front, String back, int beginningPage, double beginningPercentage, int endPage,
                            double endPercentage, int id, String hash, boolean isNew) {
         assert hash != null;
-        this.front = front.replace("\n", "<br>");
-        this.back = back.replace("\n", "<br>");
+        this.front = sanitize(front);
+        this.back = sanitize(back);
         this.beginningPage = beginningPage;
         this.beginningPercentage = beginningPercentage;
         this.endPage = endPage;
@@ -30,6 +30,10 @@ public class Card {
     public Card (String front, String back, int beginningPage, double beginningPercentage, int endPage,
                            double endPercentage, int id, String hash) {
         this(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, hash, true);
+    }
+
+    private static String sanitize(String text) {
+        return text.strip().replace("\n", "<br>").replace("‽", "");
     }
 
     public boolean isNew() {

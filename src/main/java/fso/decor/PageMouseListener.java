@@ -145,16 +145,35 @@ public class PageMouseListener implements MouseListener {
                     end = doubleTemp;
                 }
 
-                deck.addCard(question, extra, startPage, start, endPage, end);
+                Card card = deck.addCard(question, extra, startPage, start, endPage, end);
 
                 Book book = page.getBook();
                 for (int id = startPage; id <= endPage; id++) {
                     Page page = book.getPageById(id);
                     page.repaintScrollBar();
                 }
+
+                syncCardDirectly(card, book);
             }
             default -> throw new IllegalStateException("Unexpected value: " + state.getState());
         }
+    }
+
+    private void syncCardDirectly(Card card, Book book) {
+        String hash = book.getPdfManager().getPdfHash();
+        new Thread(() -> {
+            AnkiConnectHandler handler = AnkiConnectHandler.getInstance(hash);
+            if (!handler.isConnected())
+                return;
+
+            String modelName = GlobalConfig.getModelName();
+            String pdfName = GlobalConfig.getInstance(hash).getPdfName();
+            handler.createModelIfAbsent(modelName);
+            handler.createDeckIfAbsent(GlobalConfig.getDeckName(pdfName));
+            handler.transferMedia(book.getIdsToAdd());
+            handler.addCard(card.getAnkiRequest(modelName));
+            card.setNew(false);
+        }).start();
     }
 
     private double getPercentagePosition(MouseEvent e) {

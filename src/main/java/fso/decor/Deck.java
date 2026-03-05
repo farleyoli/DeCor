@@ -33,12 +33,12 @@ public class Deck {
         }
     }
 
-    public void addCard(String front, String back, int beginningPage, double beginningPercentage, int endPage,
+    public Card addCard(String front, String back, int beginningPage, double beginningPercentage, int endPage,
                            double endPercentage) {
-        addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id++);
+        return addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id++);
     }
 
-    public void addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,
+    public Card addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,
                         double endPercentage, int id, boolean isNew) {
         assert beginningPage <= endPage;
         Card card = new Card(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, pdfHash, isNew);
@@ -47,11 +47,12 @@ public class Deck {
             pageToCards.get(page).add(card);
         }
         idToCard.put(id, card);
+        return card;
     }
 
-    public void addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,
+    public Card addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,
                         double endPercentage, int id) {
-        addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, true);
+        return addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id, true);
     }
 
     public void addCardFromSerialiseString(String serialiseString) {
