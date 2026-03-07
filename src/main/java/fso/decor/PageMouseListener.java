@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 
 public class PageMouseListener implements MouseListener {
@@ -177,6 +180,7 @@ public class PageMouseListener implements MouseListener {
 
     private void syncCardDirectly(Card card, Book book) {
         String hash = book.getPdfManager().getPdfHash();
+        saveDeck(hash);
         new Thread(() -> {
             AnkiConnectHandler handler = AnkiConnectHandler.getInstance(hash);
             if (!handler.isConnected())
@@ -190,6 +194,15 @@ public class PageMouseListener implements MouseListener {
             handler.addCard(card.getAnkiRequest(modelName));
             card.setNew(false);
         }).start();
+    }
+
+    private void saveDeck(String hash) {
+        File fileToSave = new File(GlobalConfig.getImageFolder(), hash + ".deck");
+        try (PrintWriter out = new PrintWriter(fileToSave)) {
+            out.print(deck.getSerialiseString());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private double getPercentagePosition(MouseEvent e) {
