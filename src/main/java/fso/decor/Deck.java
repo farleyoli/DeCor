@@ -12,6 +12,7 @@ public class Deck {
     static final String delimiter = "‽";
     private final String pdfHash;
     private final GlobalConfig config;
+    private int sessionCardCount = 0;
 
     public Deck(String pdfHash) {
         this.pdfHash = pdfHash;
@@ -35,7 +36,12 @@ public class Deck {
 
     public Card addCard(String front, String back, int beginningPage, double beginningPercentage, int endPage,
                            double endPercentage) {
+        sessionCardCount++;
         return addCardWithId(front, back, beginningPage, beginningPercentage, endPage, endPercentage, id++);
+    }
+
+    public int getSessionCardCount() {
+        return sessionCardCount;
     }
 
     public Card addCardWithId(String front, String back, int beginningPage, double beginningPercentage, int endPage,

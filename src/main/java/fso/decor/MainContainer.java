@@ -26,6 +26,7 @@ public class MainContainer extends JFrame {
     private String pdfName = "";
     private int maxPositionOfPage;
     private JLabel ankiStatusLabel;
+    private JLabel sessionCardCountLabel;
 
     public MainContainer() {
         this(null);
@@ -74,6 +75,9 @@ public class MainContainer extends JFrame {
         updateAnkiStatus();
         Timer ankiTimer = new Timer(10000, e -> updateAnkiStatus());
         ankiTimer.start();
+
+        Timer cardCountTimer = new Timer(1000, e -> updateSessionCardCount());
+        cardCountTimer.start();
     }
 
     private File getPdfFile() {
@@ -357,6 +361,11 @@ public class MainContainer extends JFrame {
                 "Synced with Anki and saved file successfully!");
     }
 
+    private void updateSessionCardCount() {
+        int count = book.getDeck().getSessionCardCount();
+        sessionCardCountLabel.setText("Cards added: " + count);
+    }
+
     private void updateAnkiStatus() {
         new Thread(() -> {
             boolean connected = AnkiConnectHandler.getInstance(pdfManager != null ?
@@ -447,6 +456,11 @@ public class MainContainer extends JFrame {
         menuBar.add(settingsMenu);
 
         menuBar.add(Box.createHorizontalGlue());
+        sessionCardCountLabel = new JLabel("Cards added: 0");
+        sessionCardCountLabel.setFont(sessionCardCountLabel.getFont().deriveFont(Font.PLAIN, 11f));
+        sessionCardCountLabel.setForeground(Color.GRAY);
+        menuBar.add(sessionCardCountLabel);
+        menuBar.add(Box.createHorizontalStrut(15));
         ankiStatusLabel = new JLabel();
         ankiStatusLabel.setFont(ankiStatusLabel.getFont().deriveFont(Font.PLAIN, 11f));
         ankiStatusLabel.setText("Anki: Checking...");
