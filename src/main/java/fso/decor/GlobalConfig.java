@@ -113,6 +113,10 @@ public class GlobalConfig {
     public GlobalConfig() {
     }
 
+    static void setTestMode(boolean value) {
+        isTest = value;
+    }
+
     public String getPdfName() {
         return pdfName;
     }
