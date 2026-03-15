@@ -27,6 +27,7 @@ public class MainContainer extends JFrame {
     private int maxPositionOfPage;
     private JLabel ankiStatusLabel;
     private JLabel sessionCardCountLabel;
+    private JLabel imageQuestionLabel;
 
     public MainContainer() {
         this(null);
@@ -76,7 +77,10 @@ public class MainContainer extends JFrame {
         Timer ankiTimer = new Timer(10000, e -> updateAnkiStatus());
         ankiTimer.start();
 
-        Timer cardCountTimer = new Timer(1000, e -> updateSessionCardCount());
+        Timer cardCountTimer = new Timer(1000, e -> {
+            updateSessionCardCount();
+            updateImageQuestionStatus();
+        });
         cardCountTimer.start();
     }
 
@@ -366,6 +370,21 @@ public class MainContainer extends JFrame {
         sessionCardCountLabel.setText("Cards added: " + count);
     }
 
+    private void updateImageQuestionStatus() {
+        BookState bookState = book.getState();
+        if (bookState.getState() == State.WAIT_IMAGE_END) {
+            imageQuestionLabel.setText("Img Q: Selecting...");
+            imageQuestionLabel.setForeground(new Color(200, 150, 0));
+            imageQuestionLabel.setVisible(true);
+        } else if (bookState.hasImageQuestion()) {
+            imageQuestionLabel.setText("Img Q: Ready");
+            imageQuestionLabel.setForeground(new Color(0, 128, 0));
+            imageQuestionLabel.setVisible(true);
+        } else {
+            imageQuestionLabel.setVisible(false);
+        }
+    }
+
     private void updateAnkiStatus() {
         new Thread(() -> {
             boolean connected = AnkiConnectHandler.getInstance(pdfManager != null ?
@@ -456,6 +475,11 @@ public class MainContainer extends JFrame {
         menuBar.add(settingsMenu);
 
         menuBar.add(Box.createHorizontalGlue());
+        imageQuestionLabel = new JLabel();
+        imageQuestionLabel.setFont(imageQuestionLabel.getFont().deriveFont(Font.PLAIN, 11f));
+        imageQuestionLabel.setVisible(false);
+        menuBar.add(imageQuestionLabel);
+        menuBar.add(Box.createHorizontalStrut(15));
         sessionCardCountLabel = new JLabel("Cards added: 0");
         sessionCardCountLabel.setFont(sessionCardCountLabel.getFont().deriveFont(Font.PLAIN, 11f));
         sessionCardCountLabel.setForeground(Color.GRAY);

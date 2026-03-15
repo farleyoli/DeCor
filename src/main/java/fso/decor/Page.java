@@ -70,7 +70,13 @@ public class Page extends JPanel {
             ImageIcon icon = new ImageIcon(img);
             remove(label);
             remove(label);
-            label = new JLabel(icon);
+            label = new JLabel(icon) {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    paintSelectionOverlay(g);
+                }
+            };
             label.setAlignmentX(Component.CENTER_ALIGNMENT);
         } catch (IOException e) {
             System.out.println(pathToImage.getAbsolutePath());
@@ -111,9 +117,25 @@ public class Page extends JPanel {
         this.isBlank = true;
     }
 
+    private void paintSelectionOverlay(Graphics g) {
+        BookState bookState = book.getState();
+        if (bookState.getState() == State.WAIT_IMAGE_END && bookState.getImageStartPage() == pageNumber) {
+            Graphics2D g2d = (Graphics2D) g;
+            int x = bookState.getImageStartX();
+            int y = bookState.getImageStartY();
+
+            // Draw crosshair at first click position
+            g2d.setColor(new Color(0, 120, 215, 200));
+            g2d.setStroke(new BasicStroke(2));
+            g2d.drawLine(x - 20, y, x + 20, y);
+            g2d.drawLine(x, y - 20, x, y + 20);
+            g2d.drawOval(x - 10, y - 10, 20, 20);
+        }
+    }
+
     public boolean isBlank() {
         return isBlank;
-    } 
+    }
 
     public int getPageNumber() {
         return pageNumber;
@@ -125,6 +147,10 @@ public class Page extends JPanel {
 
     public void repaintScrollBar() {
         bar.repaint();
+    }
+
+    public void repaintLabel() {
+        label.repaint();
     }
 
     public Book getBook() {

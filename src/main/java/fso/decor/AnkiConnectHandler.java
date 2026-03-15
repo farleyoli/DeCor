@@ -113,9 +113,13 @@ public class AnkiConnectHandler {
                         file.getName().substring(file.getName().length() - 50) : file.getName();
                 String absoluteName = file.getAbsolutePath();
                 if (!imagesInAnki.contains(shortName) && !file.isDirectory() && absoluteName.contains(pdfHash) && absoluteName.contains(".jpg")) {
-                    int id = getIdFromImageName(file.getName());
-                    if (idsToAdd == null || !idsToAdd.contains(id))
-                        continue;
+                    if (file.getName().contains("_q_")) {
+                        // Question image — always transfer
+                    } else {
+                        int id = getIdFromImageName(file.getName());
+                        if (idsToAdd == null || !idsToAdd.contains(id))
+                            continue;
+                    }
                     String requestString = String.format("{\n" +
                             "    \"action\": \"storeMediaFile\",\n" +
                             "    \"version\": 6,\n" +
@@ -134,6 +138,30 @@ public class AnkiConnectHandler {
                 }
             }
 
+        } catch (URISyntaxException | InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void transferSingleFile(File file) {
+        try {
+            String shortName = file.getName().length() > 50 ?
+                    file.getName().substring(file.getName().length() - 50) : file.getName();
+
+            String requestString = String.format("{\n" +
+                    "    \"action\": \"storeMediaFile\",\n" +
+                    "    \"version\": 6,\n" +
+                    "    \"params\": {\n" +
+                    "        \"filename\": \"%s\",\n" +
+                    "        \"path\": \"%s\"\n" +
+                    "    }\n" + "}", shortName, file.getAbsolutePath());
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(address))
+                    .headers("Content-Type", "text/plain;charset=UTF-8")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestString))
+                    .build();
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (URISyntaxException | InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
