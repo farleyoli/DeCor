@@ -274,7 +274,7 @@ public class PageMouseListener implements MouseListener {
         return new Pair<String, String>(question, extra);
     }
 
-    private String getImageQuestionDialogResult(File imageFile) {
+    private Pair<String, String> getImageQuestionDialogResult(File imageFile) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int width = screenSize.width / 3;
         int height = screenSize.height / 3;
@@ -307,9 +307,23 @@ public class PageMouseListener implements MouseListener {
             panel.add(errorLabel, gbc);
         }
 
+        // Question text label
+        JLabel questionLabel = new JLabel("Question text (optional):");
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(questionLabel, gbc);
+
+        // Question text field
+        QuestionTextField questionField = new QuestionTextField(width, height);
+        JScrollPane questionScrollPane = new JScrollPane(questionField);
+        questionScrollPane.setPreferredSize(new Dimension(width, height / 4));
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weighty = 0.4;
+        gbc.fill = GridBagConstraints.BOTH;
+        panel.add(questionScrollPane, gbc);
+
         // Answer label
         JLabel answerLabel = new JLabel("Answer:");
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weighty = 0;
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weighty = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(answerLabel, gbc);
 
@@ -317,7 +331,7 @@ public class PageMouseListener implements MouseListener {
         QuestionTextField extraField = new QuestionTextField(width, height);
         JScrollPane extraScrollPane = new JScrollPane(extraField);
         extraScrollPane.setPreferredSize(new Dimension(width, height / 3));
-        gbc.gridx = 0; gbc.gridy = 2; gbc.weighty = 1;
+        gbc.gridx = 0; gbc.gridy = 4; gbc.weighty = 0.6;
         gbc.fill = GridBagConstraints.BOTH;
         panel.add(extraScrollPane, gbc);
 
@@ -343,7 +357,7 @@ public class PageMouseListener implements MouseListener {
 
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent e) {
-                extraField.requestFocus();
+                questionField.requestFocus();
             }
         });
 
@@ -354,7 +368,7 @@ public class PageMouseListener implements MouseListener {
         dialog.dispose();
 
         if (result == JOptionPane.OK_OPTION) {
-            return extraField.getText();
+            return new Pair<>(questionField.getText(), extraField.getText());
         }
         return null;
     }
@@ -374,13 +388,18 @@ public class PageMouseListener implements MouseListener {
 
                 if (state.hasImageQuestion()) {
                     questionImageFile = state.getImageQuestionFile();
-                    extra = getImageQuestionDialogResult(questionImageFile);
-                    if (extra == null) return; // Dialog canceled, image question stays pending
+                    var imageResult = getImageQuestionDialogResult(questionImageFile);
+                    if (imageResult == null) return; // Dialog canceled, image question stays pending
 
                     String shortName = questionImageFile.getName().length() > 50 ?
                             questionImageFile.getName().substring(questionImageFile.getName().length() - 50)
                             : questionImageFile.getName();
+                    String questionText = imageResult.first;
                     question = "<img src=\"" + shortName + "\">";
+                    if (questionText != null && !questionText.isEmpty()) {
+                        question = questionText + "<br>" + question;
+                    }
+                    extra = imageResult.second;
                     state.clearImageQuestion();
                 } else {
                     var res = getQuestionDialogResult();
