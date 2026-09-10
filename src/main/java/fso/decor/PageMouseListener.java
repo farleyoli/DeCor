@@ -9,7 +9,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class PageMouseListener implements MouseListener {
     private final Page page;
@@ -180,199 +182,6 @@ public class PageMouseListener implements MouseListener {
         }
     }
 
-    private Pair<String, String> getQuestionDialogResult() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = screenSize.width / 3;
-        int height = screenSize.height / 3;
-
-        QuestionTextField questionField = new QuestionTextField(width, height);
-        QuestionTextField extraField = new QuestionTextField(width, height);
-
-        JScrollPane questionScrollPane = new JScrollPane(questionField);
-        JScrollPane extraScrollPane = new JScrollPane(extraField);
-
-        questionScrollPane.setPreferredSize(new Dimension(width, height * 2 / 3));
-        extraScrollPane.setPreferredSize(new Dimension(width, height / 3));
-
-        JPanel panel = new JPanel(new GridBagLayout());
-
-        JLabel questionLabel = new JLabel("Question:");
-        JLabel extraLabel = new JLabel("Extra:");
-
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        gbc.gridwidth = GridBagConstraints.REMAINDER; // End row
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(4, 4, 4, 4);
-        gbc.weightx = 1;
-
-        gbc.gridx = 0; // Column 0
-        gbc.gridy = 0; // Row 0
-        gbc.weighty = 0;
-        panel.add(questionLabel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weighty = 0.66;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel.add(questionScrollPane, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(extraLabel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weighty = 0.33;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel.add(extraScrollPane, gbc);
-
-        JOptionPane pane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-
-        float opacity = GlobalConfig.getDialogOpacity();
-        JDialog dialog;
-        if (opacity < 1.0f) {
-            dialog = new JDialog((Frame) null, "Create Card", true);
-            dialog.setUndecorated(true);
-            dialog.setContentPane(pane);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setOpacity(opacity);
-            pane.addPropertyChangeListener(e -> {
-                if (dialog.isVisible() && e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)) {
-                    dialog.setVisible(false);
-                }
-            });
-        } else {
-            dialog = pane.createDialog(null, "Create Card");
-        }
-
-        // focus on first text field
-        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent e) {
-                questionField.requestFocus();
-            }
-        });
-
-        dialog.setVisible(true);
-
-        Object selectedValue = pane.getValue();
-
-        int result = (selectedValue == null ? JOptionPane.CLOSED_OPTION : (Integer) selectedValue);
-
-        dialog.dispose();
-
-        String question = "";
-        String extra = "";
-        if (result == JOptionPane.OK_OPTION) {
-            question = questionField.getText();
-            extra = extraField.getText();
-        }
-
-        return new Pair<String, String>(question, extra);
-    }
-
-    private Pair<String, String> getImageQuestionDialogResult(File imageFile) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = screenSize.width / 3;
-        int height = screenSize.height / 3;
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.insets = new Insets(4, 4, 4, 4);
-        gbc.weightx = 1;
-
-        // Image preview
-        try {
-            BufferedImage img = ImageIO.read(imageFile);
-            int previewWidth = Math.min(width - 20, img.getWidth());
-            int previewHeight = (int) ((double) img.getHeight() / img.getWidth() * previewWidth);
-            if (previewHeight > height / 2) {
-                previewHeight = height / 2;
-                previewWidth = (int) ((double) img.getWidth() / img.getHeight() * previewHeight);
-            }
-            Image scaled = img.getScaledInstance(previewWidth, previewHeight, Image.SCALE_SMOOTH);
-            JLabel imageLabel = new JLabel(new ImageIcon(scaled));
-            imageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            gbc.gridx = 0; gbc.gridy = 0; gbc.weighty = 0;
-            gbc.fill = GridBagConstraints.NONE;
-            panel.add(imageLabel, gbc);
-        } catch (IOException e) {
-            JLabel errorLabel = new JLabel("(image preview unavailable)");
-            gbc.gridx = 0; gbc.gridy = 0; gbc.weighty = 0;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            panel.add(errorLabel, gbc);
-        }
-
-        // Question text label
-        JLabel questionLabel = new JLabel("Question text (optional):");
-        gbc.gridx = 0; gbc.gridy = 1; gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(questionLabel, gbc);
-
-        // Question text field
-        QuestionTextField questionField = new QuestionTextField(width, height);
-        JScrollPane questionScrollPane = new JScrollPane(questionField);
-        questionScrollPane.setPreferredSize(new Dimension(width, height / 4));
-        gbc.gridx = 0; gbc.gridy = 2; gbc.weighty = 0.4;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel.add(questionScrollPane, gbc);
-
-        // Answer label
-        JLabel answerLabel = new JLabel("Answer:");
-        gbc.gridx = 0; gbc.gridy = 3; gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(answerLabel, gbc);
-
-        // Answer text field
-        QuestionTextField extraField = new QuestionTextField(width, height);
-        JScrollPane extraScrollPane = new JScrollPane(extraField);
-        extraScrollPane.setPreferredSize(new Dimension(width, height / 3));
-        gbc.gridx = 0; gbc.gridy = 4; gbc.weighty = 0.6;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel.add(extraScrollPane, gbc);
-
-        JOptionPane pane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-
-        float opacity = GlobalConfig.getDialogOpacity();
-        JDialog dialog;
-        if (opacity < 1.0f) {
-            dialog = new JDialog((Frame) null, "Create Card (Image Question)", true);
-            dialog.setUndecorated(true);
-            dialog.setContentPane(pane);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setOpacity(opacity);
-            pane.addPropertyChangeListener(e -> {
-                if (dialog.isVisible() && e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY)) {
-                    dialog.setVisible(false);
-                }
-            });
-        } else {
-            dialog = pane.createDialog(null, "Create Card (Image Question)");
-        }
-
-        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent e) {
-                questionField.requestFocus();
-            }
-        });
-
-        dialog.setVisible(true);
-
-        Object selectedValue = pane.getValue();
-        int result = (selectedValue == null ? JOptionPane.CLOSED_OPTION : (Integer) selectedValue);
-        dialog.dispose();
-
-        if (result == JOptionPane.OK_OPTION) {
-            return new Pair<>(questionField.getText(), extraField.getText());
-        }
-        return null;
-    }
-
     private void mouseClickedWithoutAdditionalKeys(MouseEvent e) {
         switch (state.getState()) {
             case READY -> state.setCardStart(getPercentagePosition(e), page.getPageNumber());
@@ -382,33 +191,17 @@ public class PageMouseListener implements MouseListener {
                 double start    = state.setCardEnd();
                 double end      = getPercentagePosition(e);
 
-                String question;
-                String extra;
                 File questionImageFile = null;
+                List<Pair<String, String>> results;
 
                 if (state.hasImageQuestion()) {
                     questionImageFile = state.getImageQuestionFile();
-                    var imageResult = getImageQuestionDialogResult(questionImageFile);
-                    if (imageResult == null) return; // Dialog canceled, image question stays pending
-
-                    String shortName = questionImageFile.getName().length() > 50 ?
-                            questionImageFile.getName().substring(questionImageFile.getName().length() - 50)
-                            : questionImageFile.getName();
-                    String questionText = imageResult.first;
-                    question = "<img src=\"" + shortName + "\">";
-                    if (questionText != null && !questionText.isEmpty()) {
-                        question = questionText + "<br>" + question;
-                    }
-                    extra = imageResult.second;
-                    state.clearImageQuestion();
+                    results = CardCreationDialog.showImageQuestionDialog(questionImageFile);
+                    if (results == null) return; // Dialog canceled, image question stays pending
                 } else {
-                    var res = getQuestionDialogResult();
-                    question = res.first;
-                    extra = res.second;
+                    results = CardCreationDialog.showQuestionDialog();
+                    if (results == null) return;
                 }
-
-                if (question == null || question.length() == 0)
-                    return;
 
                 // Ensure that start is before end
                 if (endPage < startPage || endPage == startPage && end < start) {
@@ -420,7 +213,42 @@ public class PageMouseListener implements MouseListener {
                     end = doubleTemp;
                 }
 
-                Card card = deck.addCard(question, extra, startPage, start, endPage, end);
+                String shortName = null;
+                if (questionImageFile != null) {
+                    String name = questionImageFile.getName();
+                    shortName = name.length() > 50 ? name.substring(name.length() - 50) : name;
+                }
+
+                List<Card> newCards = new ArrayList<>();
+                for (Pair<String, String> result : results) {
+                    String questionText = result.first == null ? "" : result.first.strip();
+                    String extra = result.second == null ? "" : result.second.strip();
+
+                    if (questionImageFile != null) {
+                        if (questionText.isEmpty() && extra.isEmpty()) continue;
+                    } else {
+                        if (questionText.isEmpty()) continue;
+                    }
+
+                    String question;
+                    if (questionImageFile != null) {
+                        question = "<img src=\"" + shortName + "\">";
+                        if (!questionText.isEmpty()) {
+                            question = questionText + "<br>" + question;
+                        }
+                    } else {
+                        question = questionText;
+                    }
+
+                    newCards.add(deck.addCard(question, extra, startPage, start, endPage, end));
+                }
+
+                if (newCards.isEmpty())
+                    return;
+
+                if (questionImageFile != null) {
+                    state.clearImageQuestion();
+                }
 
                 Book book = page.getBook();
                 for (int id = startPage; id <= endPage; id++) {
@@ -428,13 +256,13 @@ public class PageMouseListener implements MouseListener {
                     page.repaintScrollBar();
                 }
 
-                syncCardDirectly(card, book, questionImageFile);
+                syncCardsDirectly(newCards, book, questionImageFile);
             }
             default -> throw new IllegalStateException("Unexpected value: " + state.getState());
         }
     }
 
-    private void syncCardDirectly(Card card, Book book, File questionImageFile) {
+    private void syncCardsDirectly(List<Card> cards, Book book, File questionImageFile) {
         String hash = book.getPdfManager().getPdfHash();
         saveDeck(hash);
         new Thread(() -> {
@@ -450,8 +278,10 @@ public class PageMouseListener implements MouseListener {
             if (questionImageFile != null) {
                 handler.transferSingleFile(questionImageFile);
             }
-            handler.addCard(card.getAnkiRequest(modelName));
-            card.setNew(false);
+            for (Card card : cards) {
+                handler.addCard(card.getAnkiRequest(modelName));
+                card.setNew(false);
+            }
         }).start();
     }
 
