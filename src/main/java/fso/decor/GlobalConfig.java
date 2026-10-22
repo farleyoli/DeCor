@@ -1,17 +1,21 @@
 package fso.decor;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.List;
 
 public class GlobalConfig {
     private static final HashMap<String, GlobalConfig> map = new HashMap<>();
+    private final String pdfHash;
     private String pdfName = "";
+    private String deckName = "";
     private static boolean isTest = false;
     private static float dialogOpacity = 1.0f;
 
     public static GlobalConfig getInstance(String hash) {
-        map.putIfAbsent(hash, new GlobalConfig());
+        map.putIfAbsent(hash, new GlobalConfig(hash));
         return map.get(hash);
     }
 
@@ -65,10 +69,6 @@ public class GlobalConfig {
         return ret;
     }
 
-    public static String getDeckName(String pdfName) {
-        return pdfName;  // let's use pdfName for now
-    }
-
     public static File getLinuxBaseFolder() {
         String xdgDataHome = System.getenv("XDG_DATA_HOME");
         if (xdgDataHome == null || xdgDataHome.isEmpty())
@@ -110,7 +110,9 @@ public class GlobalConfig {
         return 15;
     }
 
-    public GlobalConfig() {
+    private GlobalConfig(String pdfHash) {
+        this.pdfHash = pdfHash;
+        loadDeckName();
     }
 
     static void setTestMode(boolean value) {
@@ -123,6 +125,43 @@ public class GlobalConfig {
 
     public void setPdfName(String pdfName) {
         this.pdfName = pdfName;
+    }
+
+    /**
+     * Anki deck used for this PDF. Defaults to the PDF name when the user has
+     * not chosen a different deck.
+     */
+    public String getDeckName() {
+        return deckName.isBlank() ? pdfName : deckName;
+    }
+
+    public void setDeckName(String deckName) {
+        this.deckName = deckName == null ? "" : deckName.trim();
+        File deckNameFile = getDeckNameFile();
+        try {
+            if (this.deckName.isBlank()) {
+                Files.deleteIfExists(deckNameFile.toPath());
+            } else {
+                Files.writeString(deckNameFile.toPath(), this.deckName, StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not save the Anki deck name", e);
+        }
+    }
+
+    private File getDeckNameFile() {
+        return new File(getImageFolder(), pdfHash + ".deckname");
+    }
+
+    private void loadDeckName() {
+        File deckNameFile = getDeckNameFile();
+        if (!deckNameFile.exists())
+            return;
+        try {
+            deckName = Files.readString(deckNameFile.toPath(), StandardCharsets.UTF_8).trim();
+        } catch (IOException e) {
+            System.err.println("Could not read the Anki deck name from " + deckNameFile + ": " + e.getMessage());
+        }
     }
 
     public static float getDialogOpacity() {

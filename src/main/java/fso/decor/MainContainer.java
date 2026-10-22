@@ -327,6 +327,48 @@ public class MainContainer extends JFrame {
         }
     }
 
+    private void changeAnkiDeckName() {
+        String hash = pdfManager.getPdfHash();
+        GlobalConfig config = GlobalConfig.getInstance(hash);
+        String oldDeckName = config.getDeckName();
+
+        String newDeckName = (String) JOptionPane.showInputDialog(this,
+                "Anki deck name for \"" + pdfName + "\":",
+                "Change Anki deck name", JOptionPane.PLAIN_MESSAGE,
+                null, null, oldDeckName);
+        if (newDeckName == null)
+            return;
+
+        newDeckName = newDeckName.replace("\r", "").replace("\n", "").trim();
+        if (newDeckName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "The deck name cannot be empty.",
+                    "Invalid deck name", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (newDeckName.equals(oldDeckName))
+            return;
+
+        config.setDeckName(newDeckName);
+
+        AnkiConnectHandler handler = AnkiConnectHandler.getInstance(hash);
+        if (handler.isConnected() && handler.deckExists(oldDeckName)) {
+            int rename = JOptionPane.showConfirmDialog(this,
+                    "The Anki deck \"" + oldDeckName + "\" already exists.\n" +
+                            "Rename it to \"" + newDeckName + "\" and move its existing cards?",
+                    "Rename deck in Anki", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (rename == JOptionPane.YES_OPTION && !handler.renameDeck(oldDeckName, newDeckName)) {
+                JOptionPane.showMessageDialog(this,
+                        "The new deck name was saved, but Anki could not rename the existing deck.",
+                        "Rename failed", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
+        JOptionPane.showMessageDialog(this,
+                "Anki deck name saved: " + newDeckName,
+                "Anki deck name", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     private void saveAndSyncAnki() {
         AnkiConnectHandler handler = AnkiConnectHandler.getInstance(pdfManager.getPdfHash());
 
@@ -351,8 +393,9 @@ public class MainContainer extends JFrame {
         }
 
         String modelName = GlobalConfig.getModelName();
+        GlobalConfig config = GlobalConfig.getInstance(pdfManager.getPdfHash());
         handler.createModelIfAbsent(modelName);
-        handler.createDeckIfAbsent(GlobalConfig.getDeckName(pdfName));
+        handler.createDeckIfAbsent(config.getDeckName());
         handler.transferMedia(book.getIdsToAdd());
         for (Card card : book.getDeck().getCards()) {
             if (!card.isNew())
@@ -452,8 +495,14 @@ public class MainContainer extends JFrame {
         editMenu.add(saveAndSyncItem);
 
         JMenu settingsMenu = new JMenu("Settings");
+        JMenuItem deckNameItem = new JMenuItem("Anki deck name...");
         JMenuItem opacityItem = new JMenuItem("Dialog transparency...");
+        settingsMenu.add(deckNameItem);
         settingsMenu.add(opacityItem);
+
+        deckNameItem.addActionListener(e -> {
+            changeAnkiDeckName();
+        });
 
         opacityItem.addActionListener(e -> {
             int currentPercent = Math.round((1f - GlobalConfig.getDialogOpacity()) * 100);

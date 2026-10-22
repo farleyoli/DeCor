@@ -39,7 +39,7 @@ All source is in `src/main/java/fso/decor/`. Key classes and their roles:
 - **AnkiConnectHandler** — HTTP client for the AnkiConnect API at `http://127.0.0.1:8765`. Creates the "DeCor" Anki model (using templates in `src/main/resources/`), creates decks, transfers media files, and adds new cards.
 - **BookState** — Tracks whether the user has made the first click (start of card region) and stores its coordinates.
 - **PageMouseListener** — Handles mouse clicks on a `Page` to initiate card creation (first click sets start, second click opens `QuestionTextField` dialog).
-- **GlobalConfig** — Static config/path resolver. OS-specific data dirs: Linux `~/.local/share/DeCor/`, Windows `%LOCALAPPDATA%/DeCor/`, macOS `~/Library/Application Support/DeCor/`. Contains `pdf-files/` and `images/` subdirectories. Has a `isTest` flag that redirects to isolated test directories.
+- **GlobalConfig** — Static config/path resolver. OS-specific data dirs: Linux `~/.local/share/DeCor/`, Windows `%LOCALAPPDATA%/DeCor/`, macOS `~/Library/Application Support/DeCor/`. Contains `pdf-files/` and `images/` subdirectories. Per-PDF settings are cached per hash; the Anki deck name (default: PDF filename) is persisted in `images/{hash}.deckname`. Has a `isTest` flag that redirects to isolated test directories.
 
 ## Data Flow
 
@@ -52,4 +52,4 @@ All source is in `src/main/java/fso/decor/`. Key classes and their roles:
 
 ## Anki Integration
 
-AnkiConnect must be running (Anki open with the plugin installed) for sync to work. The "DeCor" note type is auto-created on first sync using the HTML/CSS templates in `src/main/resources/`. The deck name equals the PDF filename (without `.pdf`). Image filenames sent to Anki are truncated to the last 50 characters (Anki limitation).
+AnkiConnect must be running (Anki open with the plugin installed) for sync to work. The "DeCor" note type is auto-created on first sync using the HTML/CSS templates in `src/main/resources/`. The deck name defaults to the PDF filename (without `.pdf`) but can be changed per PDF via Settings → Anki deck name; the choice is persisted in `images/{hash}.deckname`. Image filenames sent to Anki are truncated to the last 50 characters (Anki limitation).

@@ -174,7 +174,7 @@ public class AnkiConnectHandler {
                     "    \"action\": \"createDeck\",\n" +
                     "    \"version\": 6,\n" +
                     "    \"params\": {\n" +
-                    "        \"deck\": \"" + deckName + "\"\n" +
+                    "        \"deck\": \"" + StringEscapeUtils.escapeJson(deckName) + "\"\n" +
                     "    }\n" +
                     "}";
             HttpRequest request = HttpRequest.newBuilder()
@@ -194,6 +194,58 @@ public class AnkiConnectHandler {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean deckExists(String deckName) {
+        try {
+            String requestString = "{\n" +
+                    "    \"action\": \"deckNames\",\n" +
+                    "    \"version\": 6\n" +
+                    "}";
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(address))
+                    .headers("Content-Type", "text/plain;charset=UTF-8")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestString))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONObject jo = new JSONObject(response.body());
+            if (!jo.get("error").toString().equals("null") || jo.get("result").toString().equals("null"))
+                return false;
+            return Utils.JSONArrayContains((JSONArray) jo.get("result"), deckName);
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            return false;
+        }
+    }
+
+    public boolean renameDeck(String oldName, String newName) {
+        try {
+            String requestString = String.format("{\n" +
+                    "    \"action\": \"renameDeck\",\n" +
+                    "    \"version\": 6,\n" +
+                    "    \"params\": {\n" +
+                    "        \"oldName\": \"%s\",\n" +
+                    "        \"newName\": \"%s\"\n" +
+                    "    }\n" +
+                    "}", StringEscapeUtils.escapeJson(oldName), StringEscapeUtils.escapeJson(newName));
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(address))
+                    .headers("Content-Type", "text/plain;charset=UTF-8")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestString))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONObject jo = new JSONObject(response.body());
+            if (!jo.get("error").toString().equals("null")) {
+                System.out.printf("Could not rename deck %s to %s: %s\n", oldName, newName, jo.get("error"));
+                return false;
+            }
+            this.deckName = newName;
+            return true;
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            return false;
+        }
+    }
+
     public void createModelIfAbsent(String modelName) {
         this.modelName = modelName;
         try {

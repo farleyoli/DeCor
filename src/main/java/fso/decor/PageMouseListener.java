@@ -271,9 +271,9 @@ public class PageMouseListener implements MouseListener {
                 return;
 
             String modelName = GlobalConfig.getModelName();
-            String pdfName = GlobalConfig.getInstance(hash).getPdfName();
+            GlobalConfig config = GlobalConfig.getInstance(hash);
             handler.createModelIfAbsent(modelName);
-            handler.createDeckIfAbsent(GlobalConfig.getDeckName(pdfName));
+            handler.createDeckIfAbsent(config.getDeckName());
             handler.transferMedia(book.getIdsToAdd());
             if (questionImageFile != null) {
                 handler.transferSingleFile(questionImageFile);

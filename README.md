@@ -11,6 +11,7 @@ Browse a PDF page-by-page, click to mark card regions, type your question and an
 - **Multi-page cards** — Card regions can span across multiple pages
 - **Lazy rendering** — Pages are rendered on demand and cached as JPGs, keeping memory usage low even for large PDFs
 - **Direct Anki sync** — Cards are sent to Anki immediately on creation (if connected) via [AnkiConnect](https://ankiweb.net/shared/info/2055492159); also available via Ctrl+A
+- **Custom Anki deck names** — Choose which Anki deck a PDF's cards are synced to; the choice is remembered per PDF
 - **Custom Anki note type** — The "DeCor" model is auto-created on first sync, with a back template that displays the surrounding PDF pages with the card region highlighted
 - **Cross-platform** — Works on Linux, Windows, and macOS
 
@@ -54,6 +55,7 @@ Or run directly with Gradle:
 4. **Click** again to mark the **end** — a dialog opens to enter the question (front) and extra info (back)
 5. Cards sync to Anki automatically if it's running; otherwise press **Ctrl+A** to sync manually
 6. Press **Ctrl+S** to save your deck to disk
+7. Use **Settings → Anki deck name...** to choose a different Anki deck for the open PDF; the name is remembered the next time you open that PDF
 
 ### Keyboard shortcuts
 

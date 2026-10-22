@@ -105,6 +105,7 @@ public class Card {
 
     public String getAnkiRequest(String modelName) {
         GlobalConfig config = GlobalConfig.getInstance(hash);
+        String deckName = StringEscapeUtils.escapeJson(config.getDeckName());
         return String.format("{\n" +
                 "    \"action\": \"addNote\",\n" +
                 "    \"version\": 6,\n" +
@@ -136,7 +137,7 @@ public class Card {
                 "            ]\n" +
                 "        }\n" +
                 "    }\n" +
-                "}", GlobalConfig.getDeckName(config.getPdfName()), modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
-                beginningPage, beginningPercentage, endPage, endPercentage, id, hash + "_" + id, GlobalConfig.getDeckName(config.getPdfName()));
+                "}", deckName, modelName, StringEscapeUtils.escapeJson(front), StringEscapeUtils.escapeJson(back),
+                beginningPage, beginningPercentage, endPage, endPercentage, id, hash + "_" + id, deckName);
     }
 }
